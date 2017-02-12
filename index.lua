@@ -24,7 +24,7 @@ menufont = Font.load(System.currentDirectory().."font.ttf")
 Font.setPixelSizes(menufont,30)
 version="0.3.6"
 
-
+R12=0
 function loadall()
 	Cookie = Graphics.loadImage(System.currentDirectory().."data/cookie.png")
 	Shine = Graphics.loadImage(System.currentDirectory().."data/shine.png")
@@ -48,7 +48,6 @@ function loadall()
 	farm = Graphics.loadImage(System.currentDirectory().."data/farm.png")
 	mine = Graphics.loadImage(System.currentDirectory().."data/mine.png")
 	factory = Graphics.loadImage(System.currentDirectory().."data/factory.png")
-	gamesaved = Graphics.loadImage(System.currentDirectory().."data/gamesaved.png")
 	backgroundgrandma = Graphics.loadImage(System.currentDirectory().."data/backgroundgrandma.png")
 	backgroundfarm = Graphics.loadImage(System.currentDirectory().."data/backgroundfarm.png")
 	backgroundmine = Graphics.loadImage(System.currentDirectory().."data/backgroundmine.png")
@@ -552,7 +551,7 @@ while true do
 	end
 	
 	
-	if Cookie == nil or Shine == nil or Gradient == nil or StoreHead == nil or CursorBuyIcon == nil or CursorBuyIconNo == nil or GrandmaBuyIcon == nil or GrandmaBuyIconNo == nil or FarmBuyIcon == nil  or FarmBuyIconNo == nil or MineBuyIcon == nil or MineBuyIconNo == nil or FactoryBuyIcon == nil or FactoryBuyIconNo == nil or pressed == nil or favicon == nil or cursor == nil or grandma == nil or farm == nil or mine == nil or factory == nil or gamesaved == nil or backgroundgrandma == nil or backgroundfarm == nil or backgroundmine == nil or backgroundfactory == nil then
+	if Cookie == nil or Shine == nil or Gradient == nil or StoreHead == nil or CursorBuyIcon == nil or CursorBuyIconNo == nil or GrandmaBuyIcon == nil or GrandmaBuyIconNo == nil or FarmBuyIcon == nil  or FarmBuyIconNo == nil or MineBuyIcon == nil or MineBuyIconNo == nil or FactoryBuyIcon == nil or FactoryBuyIconNo == nil or pressed == nil or favicon == nil or cursor == nil or grandma == nil or farm == nil or mine == nil or factory == nil or backgroundgrandma == nil or backgroundfarm == nil or backgroundmine == nil or backgroundfactory == nil then
 	
 	else
 		justcurrency = 0
@@ -568,9 +567,8 @@ while true do
 end
 	
 	if Controls.check(pad,KEY_L) and Controls.check(pad,KEY_R) then
-		System.deleteFile("/ccsave.sav")
-		System.exit()
-		freefunction()
+		R12=R12+1
+		System.takeScreenshot("/screenshot"..R12..".bmp",false)
 	end
 	
 	Screen.flip()
