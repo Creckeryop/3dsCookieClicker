@@ -22,7 +22,7 @@ rota=255
 rotanum = 0
 menufont = Font.load(System.currentDirectory().."font.ttf")
 Font.setPixelSizes(menufont,30)
-version="0.3.6"
+version="0.3.61"
 
 R12=0
 function loadall()
@@ -268,6 +268,10 @@ while true do
 	MINE.buyicon = MineBuyIcon
 	MINE.name="Mine"
 	end
+	if COOKIE.total>=130000 then 
+	FACTORY.buyicon = FactoryBuyIcon
+	FACTORY.name="Factory"
+	end
 	if COOKIE.count >= CURSOR.price then
 	Graphics.drawImage(STORE.x, STORE.y, CURSOR.buyicon)
 	else
@@ -307,9 +311,10 @@ while true do
 	Mines()
 	end
 	if FACTORY.count>0 and FACTORY.currency ~= -1 then
-	Graphics.drawImage(BACK.x, BACK.y+71*FACTORY.currency, backgroundmine)
-	Mines()
+	Graphics.drawImage(BACK.x, BACK.y+71*FACTORY.currency, backgroundfactory)
+	Factories()
 	end
+	
 	Graphics.drawImage(0, 0, StoreHead)
 	if (STICKy<-10 and BACK.y>-9-71*(STORE.max-3)+1) or (STICKy>10 and BACK.y<62) then
 	BACK.y=BACK.y+STICKy*0.05
@@ -479,7 +484,7 @@ while true do
 	Graphics.drawImage(0, 0, menugradient)
 	Graphics.drawImage(0, 0, menutitle)
 	Graphics.termBlend()
-	Screen.debugPrint(310,220,"pre: "..version,white,TOP_SCREEN)
+	Screen.debugPrint(300,220,"pre: "..version,white,TOP_SCREEN)
 	Graphics.initBlend(BOTTOM_SCREEN)
 	Graphics.drawImage(backx, backy, BackgroundTop1)
 				Graphics.fillRect(0,320,70+28*(MENU.stat-1),98+30*(MENU.stat-1),Color.new(0,0,0,150))
