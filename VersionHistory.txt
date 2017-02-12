@@ -1,0 +1,7 @@
+from 0.0.1 to 0.2.0 -- Just trying to make that game
+0.3.0 -- New interface
+0.3.2 -- Now you can save your progress by pressing exit button
+0.3.3 -- Menu
+0.3.4 -- added factory
+0.3.5 -- some fixes 
+0.3.6 -- some fixes for prerelease for GitHub
