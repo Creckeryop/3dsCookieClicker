@@ -23,14 +23,9 @@ rota=255
 rotanum = 0
 menufont = Font.load(System.currentDirectory().."font.ttf")
 Font.setPixelSizes(menufont,30)
-<<<<<<< HEAD
 version="0.3.7"
 --Sound.init()
 --Sound.play(bgm,NO_LOOP)
-=======
-version="0.3.61"
-
->>>>>>> origin/master
 R12=0
 function loadall()
 	Cookie = Graphics.loadImage(System.currentDirectory().."data/cookie.png")
@@ -57,10 +52,7 @@ function loadall()
 	farm = Graphics.loadImage(System.currentDirectory().."data/farm.png")
 	mine = Graphics.loadImage(System.currentDirectory().."data/mine.png")
 	factory = Graphics.loadImage(System.currentDirectory().."data/factory.png")
-<<<<<<< HEAD
 	bank = Graphics.loadImage(System.currentDirectory().."data/bank.png")
-=======
->>>>>>> origin/master
 	backgroundgrandma = Graphics.loadImage(System.currentDirectory().."data/backgroundgrandma.png")
 	backgroundfarm = Graphics.loadImage(System.currentDirectory().."data/backgroundfarm.png")
 	backgroundmine = Graphics.loadImage(System.currentDirectory().."data/backgroundmine.png")
@@ -299,13 +291,10 @@ while true do
 	FACTORY.buyicon = FactoryBuyIcon
 	FACTORY.name="Factory"
 	end
-<<<<<<< HEAD
 	if COOKIE.total>=1400000 then 
 	BANK.buyicon = BankBuyIcon
 	BANK.name="Bank"
 	end
-=======
->>>>>>> origin/master
 	if COOKIE.count >= CURSOR.price then
 	Graphics.drawImage(STORE.x, STORE.y, CURSOR.buyicon)
 	else
@@ -352,13 +341,10 @@ while true do
 	if FACTORY.count>0 and FACTORY.currency ~= -1 then
 	Graphics.drawImage(BACK.x, BACK.y+71*FACTORY.currency, backgroundfactory)
 	Factories()
-<<<<<<< HEAD
 	end
 	if BANK.count>0 and BANK.currency ~= -1 then
 	Graphics.drawImage(BACK.x, BACK.y+71*BANK.currency, backgroundbank)
 	Banks()
-=======
->>>>>>> origin/master
 	end
 	
 	Graphics.drawImage(0, 0, StoreHead)
