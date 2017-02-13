@@ -7,6 +7,7 @@ white=Color.new(255,255,255)
 if System.currentDirectory() == "/" then
  System.currentDirectory("romfs:/")
 end
+--bgm = Sound.openOgg(System.currentDirectory().."data/bgm.ogg", true)
 titlecreckeryop= Graphics.loadImage(System.currentDirectory().."data/titlecreckeryop.png")
 menutitle= Graphics.loadImage(System.currentDirectory().."data/menutitle.png")
 menugradient= Graphics.loadImage(System.currentDirectory().."data/menugradient.png")
@@ -22,9 +23,10 @@ rota=255
 rotanum = 0
 menufont = Font.load(System.currentDirectory().."font.ttf")
 Font.setPixelSizes(menufont,30)
-version="0.3.6"
-
-
+version="0.3.7"
+--Sound.init()
+--Sound.play(bgm,NO_LOOP)
+R12=0
 function loadall()
 	Cookie = Graphics.loadImage(System.currentDirectory().."data/cookie.png")
 	Shine = Graphics.loadImage(System.currentDirectory().."data/shine.png")
@@ -40,7 +42,9 @@ function loadall()
 	MineBuyIconNo = Graphics.loadImage(System.currentDirectory().."data/MineBuyIconNo.png")
 	FactoryBuyIcon = Graphics.loadImage(System.currentDirectory().."data/FactoryBuyIcon.png")
 	FactoryBuyIconNo = Graphics.loadImage(System.currentDirectory().."data/FactoryBuyIconNo.png")
-
+	BankBuyIcon = Graphics.loadImage(System.currentDirectory().."data/BankBuyIcon.png")
+	BankBuyIconNo = Graphics.loadImage(System.currentDirectory().."data/BankBuyIconNo.png")
+	
 	pressed = Graphics.loadImage(System.currentDirectory().."data/pressed.png")
 	favicon = Graphics.loadImage(System.currentDirectory().."data/favicon.png")
 	cursor = Graphics.loadImage(System.currentDirectory().."data/cursor.png")
@@ -48,11 +52,12 @@ function loadall()
 	farm = Graphics.loadImage(System.currentDirectory().."data/farm.png")
 	mine = Graphics.loadImage(System.currentDirectory().."data/mine.png")
 	factory = Graphics.loadImage(System.currentDirectory().."data/factory.png")
-	gamesaved = Graphics.loadImage(System.currentDirectory().."data/gamesaved.png")
+	bank = Graphics.loadImage(System.currentDirectory().."data/bank.png")
 	backgroundgrandma = Graphics.loadImage(System.currentDirectory().."data/backgroundgrandma.png")
 	backgroundfarm = Graphics.loadImage(System.currentDirectory().."data/backgroundfarm.png")
 	backgroundmine = Graphics.loadImage(System.currentDirectory().."data/backgroundmine.png")
 	backgroundfactory = Graphics.loadImage(System.currentDirectory().."data/backgroundfactory.png")
+	backgroundbank = Graphics.loadImage(System.currentDirectory().."data/backgroundbank.png")
 end
 state="LOADING"
 Buttons={texture = {backON},texture2 = {backOFF},sizex={},sizey={},dntch={}}
@@ -63,7 +68,7 @@ MENU={stat=1,max=3,"New Game","Options","Exit"}
 justcurrency = 0
 COOKIE = {size=1,count=0,total=0}
 TOUCHes = {}
-STORE={x = 250,y = 86,stat = 0,max = 4}
+STORE={x = 250,y = 86,stat = 0,max = 5}
 Shade=Color.new(250,250,250,100)
 CpS=0
 CpSCursor=0
@@ -85,6 +90,8 @@ function freefunction()
 	Graphics.freeImage(MineBuyIconNo)
 	Graphics.freeImage(FactoryBuyIcon)
 	Graphics.freeImage(FactoryBuyIconNo)
+	Graphics.freeImage(BankBuyIcon)
+	Graphics.freeImage(BankBuyIconNo)
 	Graphics.freeImage(pressed)
 	Graphics.freeImage(favicon)
 	Graphics.freeImage(cursor)
@@ -92,11 +99,13 @@ function freefunction()
 	Graphics.freeImage(farm)
 	Graphics.freeImage(mine)
 	Graphics.freeImage(factory)
+	Graphics.freeImage(bank)
 	Graphics.freeImage(gamesaved)
 	Graphics.freeImage(backgroundgrandma)
 	Graphics.freeImage(backgroundfarm)
 	Graphics.freeImage(backgroundmine)
 	Graphics.freeImage(backgroundfactory)
+	Graphics.freeImage(backgroundbank)
 end
 function explode(div,str)
 	pos = 0
@@ -164,9 +173,16 @@ function Factories()
 		end
 	end
 end
+function Banks()
+	for i=1, BANK.count do
+		if i<=5 then 
+			Graphics.drawImage(0+45*(i-1), BACK.y+71*BANK.currency, bank)
+		end
+	end
+end
 function save()
 	savefile = io.open("/ccsave.sav",FCREATE)
-	savestring = COOKIE.count.."#"..GRANDMA.count.."#"..COOKIE.total.."#"..CURSOR.count.."#"..FARM.count.."#"..MINE.count.."#"..GRANDMA.currency.."#"..FARM.currency.."#"..MINE.currency.."#"..justcurrency.."#"..FACTORY.count.."#"..FACTORY.currency
+	savestring = COOKIE.count.."#"..GRANDMA.count.."#"..COOKIE.total.."#"..CURSOR.count.."#"..FARM.count.."#"..MINE.count.."#"..GRANDMA.currency.."#"..FARM.currency.."#"..MINE.currency.."#"..justcurrency.."#"..FACTORY.count.."#"..FACTORY.currency.."#"..BANK.count.."#"..BANK.currency
 	savestringlen = string.len(savestring)
 	io.write(savefile,0,savestring,savestringlen)
 	io.close(savefile)
@@ -190,6 +206,8 @@ function continue()
 		justcurrency = tonumber(savearray[10])
 		FACTORY.count = tonumber(savearray[11])
 		FACTORY.currency = tonumber(savearray[12])
+		BANK.count = tonumber(savearray[13]) or 0
+		BANK.currency = tonumber(savearray[14]) or -1
 		
 	end
 end
@@ -269,6 +287,14 @@ while true do
 	MINE.buyicon = MineBuyIcon
 	MINE.name="Mine"
 	end
+	if COOKIE.total>=130000 then 
+	FACTORY.buyicon = FactoryBuyIcon
+	FACTORY.name="Factory"
+	end
+	if COOKIE.total>=1400000 then 
+	BANK.buyicon = BankBuyIcon
+	BANK.name="Bank"
+	end
 	if COOKIE.count >= CURSOR.price then
 	Graphics.drawImage(STORE.x, STORE.y, CURSOR.buyicon)
 	else
@@ -294,6 +320,11 @@ while true do
 	else
 	Graphics.drawImage(STORE.x, STORE.y+132, FACTORY.buyicon,Shade)
 	end
+	if COOKIE.count >= BANK.price then
+	Graphics.drawImage(STORE.x, STORE.y+165, BANK.buyicon)
+	else
+	Graphics.drawImage(STORE.x, STORE.y+165, BANK.buyicon,Shade)
+	end
 	
 	if GRANDMA.count>0 and GRANDMA.currency ~= -1 then
 	Graphics.drawImage(BACK.x, BACK.y+71*GRANDMA.currency, backgroundgrandma)
@@ -308,11 +339,16 @@ while true do
 	Mines()
 	end
 	if FACTORY.count>0 and FACTORY.currency ~= -1 then
-	Graphics.drawImage(BACK.x, BACK.y+71*FACTORY.currency, backgroundmine)
-	Mines()
+	Graphics.drawImage(BACK.x, BACK.y+71*FACTORY.currency, backgroundfactory)
+	Factories()
 	end
+	if BANK.count>0 and BANK.currency ~= -1 then
+	Graphics.drawImage(BACK.x, BACK.y+71*BANK.currency, backgroundbank)
+	Banks()
+	end
+	
 	Graphics.drawImage(0, 0, StoreHead)
-	if (STICKy<-10 and BACK.y>-9-71*(STORE.max-3)+1) or (STICKy>10 and BACK.y<62) then
+	if (STICKy<-10 and BACK.y>-9-71*(justcurrency-3)+1) or (STICKy>10 and BACK.y<62) then
 	BACK.y=BACK.y+STICKy*0.05
 	end
 	if BACK.y<-9-71*(justcurrency-3)+1 then
@@ -363,12 +399,22 @@ while true do
 		justcurrency = justcurrency+1
 		end
 	end
+	if Controls.check(pad,KEY_A) and not Controls.check(oldpad,KEY_A) and STORE.stat==5 and COOKIE.count >= BANK.price then
+		Graphics.drawImage(STORE.x, STORE.y+33*STORE.stat, pressed)
+		BANK.count=BANK.count+1
+		COOKIE.count=COOKIE.count-BANK.price
+		if BANK.currency==-1 then 
+		BANK.currency = justcurrency 
+		justcurrency = justcurrency+1
+		end
+	end
 	
 	CURSOR.price=15*1.15^CURSOR.count
 	GRANDMA.price=100*1.15^GRANDMA.count
 	FARM.price=1000*1.15^FARM.count
 	MINE.price=12000*1.15^MINE.count
 	FACTORY.price=130000*1.15^FACTORY.count
+	BANK.price=1400000*1.15^BANK.count
 	
 	Graphics.drawImage(254, 221, favicon)
 	Graphics.termBlend()
@@ -391,6 +437,10 @@ while true do
 	if STORE.stat==4 then 
 	Screen.debugPrint(260, 55,"Quantity - "..FACTORY.count.." ", Color.new(255,255,255), TOP_SCREEN)
 	Price = FACTORY.price
+	end
+	if STORE.stat==5 then 
+	Screen.debugPrint(260, 55,"Quantity - "..BANK.count.." ", Color.new(255,255,255), TOP_SCREEN)
+	Price = BANK.price
 	end
 	if Price>COOKIE.count then
 	Screen.debugPrint(270, 224,math.floor(Price), red, TOP_SCREEN)
@@ -427,8 +477,9 @@ while true do
 	CpSFarm=8*FARM.count
 	CpSMine=47*MINE.count
 	CpSFactory=260*FACTORY.count
+	CpSBank=1400*BANK.count
 	
-	CpS=CpSCursor+CpSGrandma+CpSFarm+CpSMine
+	CpS=CpSCursor+CpSGrandma+CpSFarm+CpSMine+CpSFactory+CpSBank
 	if Timer.getTime(timer)/100>=1 then
 		Timer.reset(timer)
 		COOKIE.count=COOKIE.count+CpS/10
@@ -474,16 +525,17 @@ while true do
 		System.exit()
 		freefunction()
 	end
+	
 	elseif state=="MENU" then
 	Graphics.initBlend(TOP_SCREEN)
 	Graphics.drawImage(backx, backy, BackgroundTop1)
 	Graphics.drawImage(0, 0, menugradient)
 	Graphics.drawImage(0, 0, menutitle)
 	Graphics.termBlend()
-	Screen.debugPrint(310,220,"pre: "..version,white,TOP_SCREEN)
+	Screen.debugPrint(300,220,"pre: "..version,white,TOP_SCREEN)
 	Graphics.initBlend(BOTTOM_SCREEN)
 	Graphics.drawImage(backx, backy, BackgroundTop1)
-				Graphics.fillRect(0,320,70+28*(MENU.stat-1),98+30*(MENU.stat-1),Color.new(0,0,0,150))
+	Graphics.fillRect(0,320,70+28*(MENU.stat-1),98+30*(MENU.stat-1),Color.new(0,0,0,150))
 	Graphics.drawImage(0, 0, gradient2)
 	Graphics.termBlend()
 	--[[backx=backx-2
@@ -495,6 +547,7 @@ while true do
 	if Controls.check(pad,KEY_A) and Controls.check(oldpad,KEY_A) and MENU[MENU.stat]=="Exit" then
 		System.exit()
 		freefunction()
+		bgm = nil
 		Font.unload(menufont)
 	end
 	
@@ -552,7 +605,7 @@ while true do
 	end
 	
 	
-	if Cookie == nil or Shine == nil or Gradient == nil or StoreHead == nil or CursorBuyIcon == nil or CursorBuyIconNo == nil or GrandmaBuyIcon == nil or GrandmaBuyIconNo == nil or FarmBuyIcon == nil  or FarmBuyIconNo == nil or MineBuyIcon == nil or MineBuyIconNo == nil or FactoryBuyIcon == nil or FactoryBuyIconNo == nil or pressed == nil or favicon == nil or cursor == nil or grandma == nil or farm == nil or mine == nil or factory == nil or gamesaved == nil or backgroundgrandma == nil or backgroundfarm == nil or backgroundmine == nil or backgroundfactory == nil then
+	if Cookie == nil or Shine == nil or Gradient == nil or StoreHead == nil or CursorBuyIcon == nil or CursorBuyIconNo == nil or GrandmaBuyIcon == nil or GrandmaBuyIconNo == nil or FarmBuyIcon == nil  or FarmBuyIconNo == nil or MineBuyIcon == nil or MineBuyIconNo == nil or FactoryBuyIcon == nil or FactoryBuyIconNo == nil or pressed == nil or favicon == nil or cursor == nil or grandma == nil or farm == nil or mine == nil or factory == nil or backgroundgrandma == nil or backgroundfarm == nil or backgroundmine == nil or backgroundfactory == nil then
 	
 	else
 		justcurrency = 0
@@ -562,15 +615,15 @@ while true do
 		FARM = {buyicon=FarmBuyIconNo,price = 1000,count=0,name="???",currency = -1}
 		MINE = {buyicon=MineBuyIconNo,price = 12000,count=0,name="???",random={},currency = -1}
 		FACTORY = {buyicon=FactoryBuyIconNo,price = 130000,count=0,name="???",random={},currency = -1}
+		BANK = {buyicon=BankBuyIconNo,price = 1400000,count=0,name="???",random={},currency = -1}
 		continue()
 		state="GAME"
 	end	
 end
 	
 	if Controls.check(pad,KEY_L) and Controls.check(pad,KEY_R) then
-		System.deleteFile("/ccsave.sav")
-		System.exit()
-		freefunction()
+		R12=R12+1
+		System.takeScreenshot("/screenshot"..R12..".bmp",false)
 	end
 	
 	Screen.flip()
