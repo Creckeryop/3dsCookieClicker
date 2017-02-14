@@ -35,7 +35,6 @@ function loadall()
 	Gradient = Graphics.loadImage(System.currentDirectory().."data/Gradient.png")	
 	StoreHead = Graphics.loadImage(System.currentDirectory().."data/storehead.png")
 	ButtonsSheet = Graphics.loadImage(System.currentDirectory().."data/ButtonsSheet.png")
-	
 	pressed = Graphics.loadImage(System.currentDirectory().."data/pressed.png")
 	favicon = Graphics.loadImage(System.currentDirectory().."data/favicon.png")
 	cursor = Graphics.loadImage(System.currentDirectory().."data/cursor.png")
@@ -202,32 +201,6 @@ function ScreenButton(xbut,ybut,i,st)
 	end
 	
 end
-function IconChanger()
-	if COOKIE.total>=15 then
-	CURSOR.buyicon = CursorBuyIcon
-	CURSOR.name="Cursor"
-	end
-	if COOKIE.total>=100 then 
-	GRANDMA.buyicon = GrandmaBuyIcon
-	GRANDMA.name="Grandma"
-	end
-	if COOKIE.total>=1000 then 
-	FARM.buyicon = FarmBuyIcon
-	FARM.name="Farm"
-	end
-	if COOKIE.total>=12000 then 
-	MINE.buyicon = MineBuyIcon
-	MINE.name="Mine"
-	end
-	if COOKIE.total>=130000 then 
-	FACTORY.buyicon = FactoryBuyIcon
-	FACTORY.name="Factory"
-	end
-	if COOKIE.total>=1400000 then 
-	BANK.buyicon = BankBuyIcon
-	BANK.name="Bank"
-	end
-end
 pi=math.pi
 timer = Timer.new()
 Timer.resume(timer)
@@ -253,8 +226,6 @@ while true do
 	TOUCHCHECK()
 	Graphics.initBlend(TOP_SCREEN)
 	Graphics.drawImage(0, 0, BackgroundTop)
-	--IconChanger()
-	
 	if COOKIE.count >= CURSOR.price then
 		Graphics.drawPartialImage(STORE.x, STORE.y, 150, 0, 150, 33, ButtonsSheet)
 	elseif COOKIE.total >= 15 and COOKIE.count<CURSOR.price then
@@ -262,7 +233,6 @@ while true do
 	elseif COOKIE.total < 15 then
 		Graphics.drawPartialImage(STORE.x, STORE.y, 0, 0, 150, 33, ButtonsSheet,Shade)
 	end
-	
 	if COOKIE.count >= GRANDMA.price then
 		Graphics.drawPartialImage(STORE.x, STORE.y+33, 150, 33, 150, 33, ButtonsSheet)
 	elseif COOKIE.total >= 100 and COOKIE.count<GRANDMA.price then
@@ -270,7 +240,6 @@ while true do
 	elseif COOKIE.total < 100 then
 		Graphics.drawPartialImage(STORE.x, STORE.y+33, 0, 33, 150, 33, ButtonsSheet,Shade)
 	end
-	
 	if COOKIE.count >= FARM.price then
 		Graphics.drawPartialImage(STORE.x, STORE.y+66, 150, 66, 150, 33, ButtonsSheet)
 	elseif COOKIE.total >= 1000 and COOKIE.count<FARM.price then
@@ -278,7 +247,6 @@ while true do
 	elseif COOKIE.total < 1000 then
 		Graphics.drawPartialImage(STORE.x, STORE.y+66, 0, 66, 150, 33, ButtonsSheet,Shade)
 	end
-	
 	if COOKIE.count >= MINE.price then
 		Graphics.drawPartialImage(STORE.x, STORE.y+99, 150, 99, 150, 33, ButtonsSheet)
 	elseif COOKIE.total >= 12000 and COOKIE.count<MINE.price then
@@ -286,7 +254,6 @@ while true do
 	elseif COOKIE.total < 12000 then
 		Graphics.drawPartialImage(STORE.x, STORE.y+99, 0, 99, 150, 33, ButtonsSheet,Shade)
 	end
-	
 	if COOKIE.count >= FACTORY.price then
 		Graphics.drawPartialImage(STORE.x, STORE.y+132, 150, 132, 150, 33, ButtonsSheet)
 	elseif COOKIE.total >= 130000 and COOKIE.count<FACTORY.price then
@@ -294,7 +261,6 @@ while true do
 	elseif COOKIE.total < 130000 then
 		Graphics.drawPartialImage(STORE.x, STORE.y+132, 0, 132, 150, 33, ButtonsSheet,Shade)
 	end
-	
 	if COOKIE.count >= BANK.price then
 		Graphics.drawPartialImage(STORE.x, STORE.y+165, 150, 165, 150, 33, ButtonsSheet)
 	elseif COOKIE.total >= 1400000 and COOKIE.count<BANK.price then
@@ -302,7 +268,6 @@ while true do
 	elseif COOKIE.total < 1400000 then
 		Graphics.drawPartialImage(STORE.x, STORE.y+165, 0, 165, 150, 33, ButtonsSheet,Shade)
 	end
-	
 	if GRANDMA.count>0 and GRANDMA.currency ~= -1 then
 	Graphics.drawPartialImage(BACK.x, BACK.y+71*GRANDMA.currency,0,0,242,71,BackgroundSprites)
 	Grandmother()
@@ -323,7 +288,6 @@ while true do
 	Graphics.drawPartialImage(BACK.x, BACK.y+71*BANK.currency,0,284,242,71,BackgroundSprites)
 	Banks()
 	end
-	
 	Graphics.drawImage(0, 0, StoreHead)
 	for i=1, batterylevel do
 		Graphics.fillRect(7+4*(i-1),10+4*(i-1),227,235,BatteryColor)
@@ -388,14 +352,12 @@ while true do
 		justcurrency = justcurrency+1
 		end
 	end
-	
 	CURSOR.price=15*1.15^CURSOR.count
 	GRANDMA.price=100*1.15^GRANDMA.count
 	FARM.price=1000*1.15^FARM.count
 	MINE.price=12000*1.15^MINE.count
 	FACTORY.price=130000*1.15^FACTORY.count
 	BANK.price=1400000*1.15^BANK.count
-	
 	Graphics.drawImage(254, 221, favicon)
 	Graphics.termBlend()
 	if STORE.stat==0 then 
@@ -427,21 +389,17 @@ while true do
 	else
 	Screen.debugPrint(270, 224,math.floor(Price), green, TOP_SCREEN)
 	end
-	 
 	Screen.debugPrint(25, 10, math.floor(COOKIE.count).." Cookies                                                                                                       ", Color.new(255,255,255), TOP_SCREEN)
 	Screen.debugPrint(5, 30,"per second : "..CpS, Color.new(255,255,255), TOP_SCREEN)
 	Screen.debugPrint(5, 210,Th..":"..Tm, Color.new(255,255,255), TOP_SCREEN)
 	if batterylevel>=4 then BatteryColor = green end
 	if batterylevel>=2 and batterylevel<4 then BatteryColor = yellow end
 	if batterylevel>=0 and batterylevel<2 then BatteryColor = red end
-	
-	 
 	Graphics.initBlend(BOTTOM_SCREEN)
 	Graphics.drawImage(0, 0, BackgroundBottom)
 	Graphics.drawImageExtended(160, 120, 0, 0, 256, 256 ,SHINE.rot, 1,1, Shine)
 	Graphics.drawImageExtended(160, 120, 0, 0, 256, 256 ,-SHINE.rot, 1,1, Shine)
 	Graphics.drawImageExtended(160, 120, 0, 0, 128, 128 ,0, COOKIE.size,COOKIE.size, Cookie)
-
 	Graphics.drawImage(0, 0, Gradient)
 	ScreenButton(260,210,1,"MENU1")
 	Cursor()
@@ -464,7 +422,6 @@ while true do
 	CpSMine=47*MINE.count
 	CpSFactory=260*FACTORY.count
 	CpSBank=1400*BANK.count
-	
 	CpS=CpSCursor+CpSGrandma+CpSFarm+CpSMine+CpSFactory+CpSBank
 	if Timer.getTime(timer)/100>=1 then
 		Timer.reset(timer)
@@ -474,9 +431,7 @@ while true do
 --[[	if Timer.getTime(saving)/60000>=1 then
 		autosaving(saving)
 	end--]]
-
 	elseif state=="LOADING" then
-	
 	Graphics.initBlend(TOP_SCREEN)
 	Graphics.drawImage(0, 0, titlecreckeryop)
 	Graphics.fillRect(0,400,0,240,Color.new(0,0,0,rota))
@@ -498,7 +453,6 @@ while true do
 	if rota==255 and rotanum==1 then
 	rotanum=2
 	end
-	
 	if startloading==0 and rotanum==2 then
 	state="MENU"
 	startloading=1
@@ -506,7 +460,6 @@ while true do
 		MENU[1]="Continue"
 	end
 	end
-	
 	if Controls.check(pad,KEY_START) and Controls.check(pad,KEY_START) then
 		System.exit()
 		freefunction()
@@ -567,7 +520,6 @@ while true do
 		end
 	if Controls.check(pad,KEY_A) and Controls.check(oldpad,KEY_A) and MENU[MENU.stat]=="Erease data" and presssing=="NOT PRESSED" then
 		System.deleteFile("/ccsave.sav")
-		
 		presssing="PRESSED"
 	end
 	if Controls.check(pad,KEY_A) and Controls.check(oldpad,KEY_A) and MENU[MENU.stat]=="Back" and presssing=="NOT PRESSED" then
@@ -589,8 +541,6 @@ while true do
 	if Controls.check(pad,KEY_A) and (MENU[MENU.stat]=="New Game" or MENU[MENU.stat]=="Continue") and CursorBuyIcon ~= nil then
 		Cookie = Graphics.loadImage(System.currentDirectory().."data/cookie.png")
 	end
-	
-	
 	if Cookie == nil or Shine == nil or Gradient == nil or StoreHead == nil or pressed == nil or favicon == nil or cursor == nil or BackgroundSprites == nil or ObjectsSheet == nil or ButtonsSheet == nil then
 	
 	else
@@ -606,12 +556,10 @@ while true do
 		state="GAME"
 	end	
 end
-	
 	if Controls.check(pad,KEY_L) and Controls.check(pad,KEY_R) then
 		R12=R12+1
 		System.takeScreenshot("/screenshot"..R12..".bmp",false)
 	end
-	
 	Screen.flip()
 	Screen.waitVblankStart()
 	oldpad = pad
