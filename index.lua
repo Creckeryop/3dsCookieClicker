@@ -5,10 +5,12 @@ yellow=Color.new(255,255,80)
 redformenu=Color.new(255,0,0)
 green=Color.new(80,255,80)
 white=Color.new(255,255,255)
+Th,Tm,Ts = System.getTime()
+math.randomseed(Th*3600+Tm*60+Ts)
 if System.currentDirectory() == "/" then
  System.currentDirectory("romfs:/")
 end
-bgm = Sound.openOgg(System.currentDirectory().."data/bgm.ogg", true)
+bgm = Sound.openOgg(System.currentDirectory().."data/bgm.ogg", false)
 titlecreckeryop= Graphics.loadImage(System.currentDirectory().."data/titlecreckeryop.png")
 menutitle= Graphics.loadImage(System.currentDirectory().."data/menutitle.png")
 menugradient= Graphics.loadImage(System.currentDirectory().."data/menugradient.png")
@@ -24,11 +26,12 @@ rota=255
 rotanum = 0
 menufont = Font.load(System.currentDirectory().."font.ttf")
 Font.setPixelSizes(menufont,30)
-version="0.4"
+version="0.5"
 Sound.init()
 Sound.play(bgm,LOOP)
 R12=0
 BatteryColor = green
+batterylevel = System.getBatteryLife()
 function loadall()
 	Cookie = Graphics.loadImage(System.currentDirectory().."data/cookie.png")
 	Shine = Graphics.loadImage(System.currentDirectory().."data/shine.png")
@@ -50,13 +53,21 @@ MENU={stat=1,max=3,"New Game","Options","Exit"}
 justcurrency = 0
 COOKIE = {size=1,count=0,total=0}
 TOUCHes = {}
-STORE={x = 250,y = 86,stat = 0,max = 5}
+STORE={x = 250,y = 86,stat = 0,max = 6}
 Shade=Color.new(250,250,250,100)
 CpS=0
 CpSCursor=0
 BACK={x=0,y=64}
 holdtoexit = 0
 startloading=0 
+TOUCHALTER=0
+function xmax(nameofcount,numofmax)
+local answer = 0
+if nameofcount>=numofmax then
+answer = nameofcount
+end
+return answer
+end
 function freefunction()
 	Graphics.freeImage(Cookie)
 	Graphics.freeImage(Shine)
@@ -80,71 +91,88 @@ function explode(div,str)
 	return arr
 end
 function TOUCHCHECK()
-	if TOUCHx > (160-64*COOKIE.size) and TOUCHx < (160+64*COOKIE.size) and TOUCHy > (120-64*COOKIE.size) and TOUCHy < (120+64*COOKIE.size) then
+	if TOUCHx > (160-64*COOKIE.size) and TOUCHx < (160+64*COOKIE.size) and TOUCHy > (120-64*COOKIE.size) and TOUCHy < (120+64*COOKIE.size) and TOUCHALTER~=1 then
 		if COOKIE.size < 1.2 then COOKIE.size = COOKIE.size + 0.1 end
 		TOUCHYstatus = "PRESSED"
 		TOUCHes.xlast = TOUCHx
 		TOUCHes.ylast = TOUCHy
 	else
-		if TOUCHx == 0 and TOUCHy == 0 and TOUCHYstatus == "PRESSED" then
+		if TOUCHx == 0 and TOUCHy == 0 and TOUCHYstatus == "PRESSED" and TOUCHALTER~=1 then
 		COOKIE.count=COOKIE.count+1
 		COOKIE.total=COOKIE.total+1
 		end
 		TOUCHYstatus = "NOT PRESSED"
-		if COOKIE.size > 1 then COOKIE.size = COOKIE.size-0.1 end
+		if COOKIE.size > 1 and TOUCHALTER~=1              then COOKIE.size = COOKIE.size-0.1 end
 	end
+end
+function alternativeclick()
+if Controls.check(pad,KEY_X) and not Controls.check(oldpad,KEY_X) then
+		COOKIE.count=COOKIE.count+1
+		COOKIE.total=COOKIE.total+1
+end
+if Controls.check(pad,KEY_X) then
+	TOUCHALTER = 1
+	if COOKIE.size < 1.2 then COOKIE.size = COOKIE.size + 0.1 end
+else
+	TOUCHALTER = 0
+	if COOKIE.size > 1 and TOUCHALTER == 1  then COOKIE.size = COOKIE.size-0.1  end
+end
 end
 function Cursor()
 	for i=1, CURSOR.count do
-		if i<=14 then
-			Graphics.drawImageExtended(160, 120, 0, 0, 17, 180 ,-(CURSOR.rot+pi/7*i), 1.2,1.2, cursor)
-		end
+	if i<=14 then 
+		Graphics.drawImageExtended(160, 120, 0, 0, 17, 180 ,-(CURSOR.rot+pi/7*i), 1.2,1.2, cursor)
+	end
 	end
 end
 function Grandmother()
 	for i=1, GRANDMA.count do
 		if i<=6 then 
-			Graphics.drawPartialImage(35*(i-1), BACK.y+71*GRANDMA.currency, 0, 0, 50, 50, ObjectsSheet)
+			Graphics.drawPartialImage(35*(i-1),8+BACK.y+71*GRANDMA.currency, 0, 0, 50, 50, ObjectsSheet)
+		
 		end
 	end
 end
 function Farms()
 	for i=1, FARM.count do
-		if i<=5 then 
-			if i==1 or i==3 or i==5 then
-				Graphics.drawPartialImage(45*(i-1), BACK.y+71*FARM.currency, 50, 0, 50, 50, ObjectsSheet)
-			end
-			if i==2 or i==4 then
-				Graphics.drawPartialImage(45*(i-1), BACK.y+71*FARM.currency+10, 50, 0, 50, 50, ObjectsSheet)
-			end
+		if i<=4 then 
+				Graphics.drawPartialImage(10+55*(i-1),12+BACK.y+71*FARM.currency, 50, 0, 50, 50, ObjectsSheet)
 		end
 	end
 end
 function Mines()
-	for i=1, MINE.count do
-		if i<=5 then 
-			MINE.random[i]=MINE.random[i] or math.random(0,30)
-			Graphics.drawPartialImage(45*(i-1), BACK.y+71*MINE.currency+MINE.random[i], 100, 0, 50, 50, ObjectsSheet)
+	for i=1,MINE.count do
+		if i<=4 then 
+			MINE.random[i]=MINE.random[i] or math.random(0,8)
+			Graphics.drawPartialImage(10+55*(i-1),12+BACK.y+71*MINE.currency-MINE.random[i], 100, 0, 50, 50, ObjectsSheet)
 		end
 	end
 end
 function Factories()
 	for i=1, FACTORY.count do
-		if i<=5 then 
-			Graphics.drawPartialImage(45*(i-1), BACK.y+71*FACTORY.currency, 150, 0, 50, 50, ObjectsSheet)
+		if i<=4 then 
+			Graphics.drawPartialImage(10+55*(i-1),5+BACK.y+71*FACTORY.currency, 150, 0, 50, 50, ObjectsSheet)
 		end
 	end
 end
 function Banks()
+
 	for i=1, BANK.count do
-		if i<=5 then 
-			Graphics.drawImage(0+45*(i-1), BACK.y+71*BANK.currency, 200, 0, 50, 50, ObjectsSheet)
+		if i<=4 then 
+			Graphics.drawPartialImage(10+55*(i-1),5+BACK.y+71*BANK.currency, 200, 0, 50, 50, ObjectsSheet)
+		end
+	end
+end
+function Temples()
+	for i=1, TEMPLE.count do
+		if i<=4 then 
+			Graphics.drawPartialImage(10+55*(i-1),5+BACK.y+71*TEMPLE.currency, 250, 0, 50, 50, ObjectsSheet)
 		end
 	end
 end
 function save()
 	savefile = io.open("/ccsave.sav",FCREATE)
-	savestring = COOKIE.count.."#"..GRANDMA.count.."#"..COOKIE.total.."#"..CURSOR.count.."#"..FARM.count.."#"..MINE.count.."#"..GRANDMA.currency.."#"..FARM.currency.."#"..MINE.currency.."#"..justcurrency.."#"..FACTORY.count.."#"..FACTORY.currency.."#"..BANK.count.."#"..BANK.currency.."#"
+	savestring = COOKIE.count.."#"..GRANDMA.count.."#"..COOKIE.total.."#"..CURSOR.count.."#"..FARM.count.."#"..MINE.count.."#"..GRANDMA.currency.."#"..FARM.currency.."#"..MINE.currency.."#"..justcurrency.."#"..FACTORY.count.."#"..FACTORY.currency.."#"..BANK.count.."#"..BANK.currency.."#"..TEMPLE.count.."#"..TEMPLE.currency.."#"
 	savestringlen = string.len(savestring)
 	io.write(savefile,0,savestring,savestringlen)
 	io.close(savefile)
@@ -166,10 +194,12 @@ function continue()
 		FARM.currency = tonumber(savearray[8])
 		MINE.currency = tonumber(savearray[9])
 		justcurrency = tonumber(savearray[10])
-		FACTORY.count = tonumber(savearray[11])
-		FACTORY.currency = tonumber(savearray[12])
-		BANK.count = tonumber(savearray[13]) or tonumber(0)
-		BANK.currency = tonumber(savearray[14]) or tonumber(-1)
+		FACTORY.count = tonumber(savearray[11]) or 0 
+		FACTORY.currency = tonumber(savearray[12]) or -1
+		BANK.count = tonumber(savearray[13]) or 0
+		BANK.currency = tonumber(savearray[14]) or -1
+		TEMPLE.count = tonumber(savearray[15]) or 0
+		TEMPLE.currency = tonumber(savearray[16]) or -1
 	end
 end
 function ScreenButton(xbut,ybut,i,st)
@@ -199,19 +229,18 @@ function ScreenButton(xbut,ybut,i,st)
 			Graphics.drawImage(xbut,ybut,Buttons.texture[i])
 		end
 	end
-	
 end
 pi=math.pi
 timer = Timer.new()
 Timer.resume(timer)
+GetBattery = Timer.new()
+Timer.resume(GetBattery)
 function System.wait(milliseconds)
    tmp = Timer.new()
    while Timer.getTime(tmp) < milliseconds do end
    Timer.destroy(tmp)
 end
 while true do
-	Th,Tm,Ts = System.getTime()
-	batterylevel = System.getBatteryLife()
 	Screen.refresh()
 	Screen.clear(TOP_SCREEN)
 	Screen.clear(BOTTOM_SCREEN)
@@ -223,6 +252,7 @@ while true do
 	if SHINE.rot >= 2*pi then SHINE.rot = SHINE.rot-2*pi end
 		CURSOR.rot=CURSOR.rot+CURSOR.speed
 	if CURSOR.rot >= 2*pi then CURSOR.rot = CURSOR.rot-2*pi end
+	alternativeclick()
 	TOUCHCHECK()
 	Graphics.initBlend(TOP_SCREEN)
 	Graphics.drawImage(0, 0, BackgroundTop)
@@ -268,25 +298,36 @@ while true do
 	elseif COOKIE.total < 1400000 then
 		Graphics.drawPartialImage(STORE.x, STORE.y+165, 0, 165, 150, 33, ButtonsSheet,Shade)
 	end
-	if GRANDMA.count>0 and GRANDMA.currency ~= -1 then
+	if COOKIE.count >= TEMPLE.price then
+		Graphics.drawPartialImage(STORE.x, STORE.y+198, 150, 198, 150, 33, ButtonsSheet)
+	elseif COOKIE.total >= 20000000 and COOKIE.count<TEMPLE.price then
+		Graphics.drawPartialImage(STORE.x, STORE.y+198, 150, 198, 150, 33, ButtonsSheet,Shade)
+	elseif COOKIE.total < 20000000 then
+		Graphics.drawPartialImage(STORE.x, STORE.y+198, 0, 198, 150, 33, ButtonsSheet,Shade)
+	end
+	if GRANDMA.count>0 and BACK.y>=-10-71*GRANDMA.currency and BACK.y<200+71*GRANDMA.currency and GRANDMA.currency ~= -1 then
 	Graphics.drawPartialImage(BACK.x, BACK.y+71*GRANDMA.currency,0,0,242,71,BackgroundSprites)
 	Grandmother()
 	end
-	if FARM.count>0 and FARM.currency ~= -1 then
+	if FARM.count>0 and BACK.y>=-10-71*FARM.currency and BACK.y<200+71*FARM.currency and FARM.currency ~= -1 then
 	Graphics.drawPartialImage(BACK.x, BACK.y+71*FARM.currency,0,71,242,71,BackgroundSprites)
 	Farms()
 	end
-	if MINE.count>0 and MINE.currency ~= -1 then
+	if MINE.count>0 and BACK.y>=-10-71*MINE.currency and BACK.y<200+71*MINE.currency and MINE.currency ~= -1 then
 	Graphics.drawPartialImage(BACK.x, BACK.y+71*MINE.currency,0,142,242,71,BackgroundSprites)
 	Mines()
 	end
-	if FACTORY.count>0 and FACTORY.currency ~= -1 then
+	if FACTORY.count>0 and BACK.y>=-10-71*FACTORY.currency and BACK.y<200+71*FACTORY.currency and  FACTORY.currency ~= -1 then
 	Graphics.drawPartialImage(BACK.x, BACK.y+71*FACTORY.currency,0,213,242,71,BackgroundSprites)
 	Factories()
 	end
-	if BANK.count>0 and BANK.currency ~= -1 then
+	if BANK.count>0 and BACK.y>=-10-71*BANK.currency and BACK.y<200+71*BANK.currency and BANK.currency ~= -1 then
 	Graphics.drawPartialImage(BACK.x, BACK.y+71*BANK.currency,0,284,242,71,BackgroundSprites)
 	Banks()
+	end
+	if TEMPLE.count>0 and BACK.y>=-10-71*TEMPLE.currency and BACK.y<200+71*TEMPLE.currency and TEMPLE.currency ~= -1 then
+	Graphics.drawPartialImage(BACK.x, BACK.y+71*TEMPLE.currency,0,355,242,71,BackgroundSprites)
+	Temples()
 	end
 	Graphics.drawImage(0, 0, StoreHead)
 	for i=1, batterylevel do
@@ -352,12 +393,22 @@ while true do
 		justcurrency = justcurrency+1
 		end
 	end
+	if Controls.check(pad,KEY_A) and not Controls.check(oldpad,KEY_A) and STORE.stat==6 and COOKIE.count >= TEMPLE.price then
+		Graphics.drawImage(STORE.x, STORE.y+33*STORE.stat, pressed)
+		TEMPLE.count=TEMPLE.count+1
+		COOKIE.count=COOKIE.count-TEMPLE.price
+		if TEMPLE.currency == -1 then 
+		TEMPLE.currency = justcurrency 
+		justcurrency = justcurrency+1
+		end
+	end
 	CURSOR.price=15*1.15^CURSOR.count
 	GRANDMA.price=100*1.15^GRANDMA.count
 	FARM.price=1000*1.15^FARM.count
 	MINE.price=12000*1.15^MINE.count
 	FACTORY.price=130000*1.15^FACTORY.count
 	BANK.price=1400000*1.15^BANK.count
+	TEMPLE.price=20000000*1.15^TEMPLE.count
 	Graphics.drawImage(254, 221, favicon)
 	Graphics.termBlend()
 	if STORE.stat==0 then 
@@ -384,6 +435,10 @@ while true do
 	Screen.debugPrint(260, 55,"Quantity - "..BANK.count.." ", Color.new(255,255,255), TOP_SCREEN)
 	Price = BANK.price
 	end
+	if STORE.stat==6 then 
+	Screen.debugPrint(260, 55,"Quantity - "..TEMPLE.count.." ", Color.new(255,255,255), TOP_SCREEN)
+	Price = TEMPLE.price
+	end
 	if Price>COOKIE.count then
 	Screen.debugPrint(270, 224,math.floor(Price), red, TOP_SCREEN)
 	else
@@ -401,7 +456,7 @@ while true do
 	Graphics.drawImageExtended(160, 120, 0, 0, 256, 256 ,-SHINE.rot, 1,1, Shine)
 	Graphics.drawImageExtended(160, 120, 0, 0, 128, 128 ,0, COOKIE.size,COOKIE.size, Cookie)
 	Graphics.drawImage(0, 0, Gradient)
-	ScreenButton(260,210,1,"MENU1")
+	ScreenButton(250,210,1,"MENU1")
 	Cursor()
 	Graphics.termBlend()
 	if STORE.y<86+33*(-STORE.stat) then 
@@ -422,11 +477,17 @@ while true do
 	CpSMine=47*MINE.count
 	CpSFactory=260*FACTORY.count
 	CpSBank=1400*BANK.count
-	CpS=CpSCursor+CpSGrandma+CpSFarm+CpSMine+CpSFactory+CpSBank
+	CpSTemple=7800*TEMPLE.count
+	CpS=CpSCursor+CpSGrandma+CpSFarm+CpSMine+CpSFactory+CpSBank+CpSTemple
 	if Timer.getTime(timer)/100>=1 then
 		Timer.reset(timer)
 		COOKIE.count=COOKIE.count+CpS/10
 		COOKIE.total=COOKIE.total+CpS/10
+	end
+	if Timer.getTime(GetBattery)/60000>=1 then
+		Timer.reset(GetBattery)
+		Th,Tm,Ts = System.getTime()
+		batterylevel = System.getBatteryLife()
 	end
 --[[	if Timer.getTime(saving)/60000>=1 then
 		autosaving(saving)
@@ -460,9 +521,13 @@ while true do
 		MENU[1]="Continue"
 	end
 	end
-	if Controls.check(pad,KEY_START) and Controls.check(pad,KEY_START) then
+	if Controls.check(pad,KEY_START) and not Controls.check(oldpad,KEY_START) then
+		Sound.close(bgm)
+		Sound.term()
 		System.exit()
 		freefunction()
+		bgm = nil
+		Font.unload(menufont)
 	end 
 	elseif state=="MENU" then
 	Graphics.initBlend(TOP_SCREEN)
@@ -534,7 +599,6 @@ while true do
 		presssing="PRESSED"
 	end
 	if Controls.check(pad,KEY_A) then
-		
 	else
 		presssing="NOT PRESSED"
 	end
@@ -542,19 +606,21 @@ while true do
 		Cookie = Graphics.loadImage(System.currentDirectory().."data/cookie.png")
 	end
 	if Cookie == nil or Shine == nil or Gradient == nil or StoreHead == nil or pressed == nil or favicon == nil or cursor == nil or BackgroundSprites == nil or ObjectsSheet == nil or ButtonsSheet == nil then
-	
 	else
 		justcurrency = 0
 		COOKIE = {size=1,count=0,total=0}
-		GRANDMA = {buyicon=GrandmaBuyIconNo,price = 100,count=0,name="???",currency = -1}
-		CURSOR = {buyicon=CursorBuyIconNo,price = 15,count=0,name="???",rot=0,speed=0.008,currency = -1}
-		FARM = {buyicon=FarmBuyIconNo,price = 1000,count=0,name="???",currency = -1}
-		MINE = {buyicon=MineBuyIconNo,price = 12000,count=0,name="???",random={},currency = -1}
-		FACTORY = {buyicon=FactoryBuyIconNo,price = 130000,count=0,name="???",random={},currency = -1}
-		BANK = {buyicon=BankBuyIconNo,price = 1400000,count=0,name="???",random={},currency = -1}
+		GRANDMA = {price = 100,count=0,currency = -1}
+		CURSOR = {price = 15,count=0,rot=0,speed=0.008,currency = -1}
+		FARM = {price = 1000,count=0,currency = -1}
+		MINE = {price = 12000,count=0,random={},currency = -1}
+		FACTORY = {price = 130000,count=0,currency = -1}
+		BANK = {price = 1400000,count=0,currency = -1}
+		TEMPLE = {price = 1400000,count=0,currency = -1}
 		continue()
 		state="GAME"
 	end	
+	elseif state=="SAVED" then
+	Screen.debugPrint(0,0,"Your progress was saved.",white,TOP_SCREEN)
 end
 	if Controls.check(pad,KEY_L) and Controls.check(pad,KEY_R) then
 		R12=R12+1
@@ -563,9 +629,10 @@ end
 	Screen.flip()
 	Screen.waitVblankStart()
 	oldpad = pad
---[[	
-		-- Sets up HomeMenu syscall
+	--[[	-- Sets up HomeMenu syscall
 	if Controls.check(Controls.read(),KEY_HOME) or Controls.check(Controls.read(),KEY_POWER) then
+		save()
+		state="SAVED"
 		System.showHomeMenu()
 	end
 	
@@ -575,8 +642,5 @@ end
 		save()
 		end
 		System.exit()
-	if System.checkStatus() == APP_RUNNING then
-	loadall()
-	end
 	end]]--
 end
