@@ -10,7 +10,8 @@ math.randomseed(Th*3600+Tm*60+Ts)
 if System.currentDirectory() == "/" then
  System.currentDirectory("romfs:/")
 end
-bgm = Sound.openOgg(System.currentDirectory().."data/bgm.ogg", false)
+
+
 titlecreckeryop= Graphics.loadImage(System.currentDirectory().."data/titlecreckeryop.png")
 menutitle= Graphics.loadImage(System.currentDirectory().."data/menutitle.png")
 menugradient= Graphics.loadImage(System.currentDirectory().."data/menugradient.png")
@@ -20,18 +21,34 @@ BackgroundBottom = Graphics.loadImage(System.currentDirectory().."data/backgroun
 BackgroundTop1 = Graphics.loadImage(System.currentDirectory().."data/backgroundtop1.png")
 backON = Graphics.loadImage(System.currentDirectory().."data/backON.png")
 backOFF= Graphics.loadImage(System.currentDirectory().."data/backOFF.png")
+exitON = Graphics.loadImage(System.currentDirectory().."data/exitON.png")
+exitOFF= Graphics.loadImage(System.currentDirectory().."data/exitOFF.png")
+playON = Graphics.loadImage(System.currentDirectory().."data/playON.png")
+playOFF= Graphics.loadImage(System.currentDirectory().."data/playOFF.png")
+CMON = Graphics.loadImage(System.currentDirectory().."data/CMON.png")
+CMOFF = Graphics.loadImage(System.currentDirectory().."data/CMOFF.png")
+optionsON = Graphics.loadImage(System.currentDirectory().."data/optionsON.png")
+optionsOFF = Graphics.loadImage(System.currentDirectory().."data/optionsOFF.png")
+resetON = Graphics.loadImage(System.currentDirectory().."data/resetON.png")
+resetOFF = Graphics.loadImage(System.currentDirectory().."data/resetOFF.png")
+resetNET = Graphics.loadImage(System.currentDirectory().."data/resetNET.png")
+AUTHORTEXT = Graphics.loadImage(System.currentDirectory().."data/AUTHOR.png")
+
 backx=0
 backy=0
 rota=255
 rotanum = 0
-menufont = Font.load(System.currentDirectory().."font.ttf")
-Font.setPixelSizes(menufont,30)
-version="0.5"
+version="0.6.5"
 Sound.init()
+function loadmusic()
+bgm = Sound.openOgg(System.currentDirectory().."data/bgm.ogg", false)
+
 Sound.play(bgm,LOOP)
+end
 R12=0
 BatteryColor = green
 batterylevel = System.getBatteryLife()
+
 function loadall()
 	Cookie = Graphics.loadImage(System.currentDirectory().."data/cookie.png")
 	Shine = Graphics.loadImage(System.currentDirectory().."data/shine.png")
@@ -45,7 +62,7 @@ function loadall()
 	BackgroundSprites= Graphics.loadImage(System.currentDirectory().."data/BackgroundSprites.png")
 end
 state="LOADING"
-Buttons={texture = {backON},texture2 = {backOFF},sizex={},sizey={},dntch={}}
+Buttons={texture = {backON,playON,CMON,exitON,optionsON,resetON},texture2 = {backOFF,playOFF,CMOFF,exitOFF,optionsOFF,resetOFF},sizex={},sizey={},dntch={}}
 SHINE={}
 SHINE.rot=0
 SHINE.speed=0.005
@@ -53,7 +70,7 @@ MENU={stat=1,max=3,"New Game","Options","Exit"}
 justcurrency = 0
 COOKIE = {size=1,count=0,total=0}
 TOUCHes = {}
-STORE={x = 250,y = 86,stat = 0,max = 6}
+STORE={x = 250,y = 86,stat = 0,max = 7}
 Shade=Color.new(250,250,250,100)
 CpS=0
 CpSCursor=0
@@ -61,12 +78,12 @@ BACK={x=0,y=64}
 holdtoexit = 0
 startloading=0 
 TOUCHALTER=0
-function xmax(nameofcount,numofmax)
-local answer = 0
-if nameofcount>=numofmax then
-answer = nameofcount
+activatescreenshot=0
+function screenshotmake()
+if activatescreenshot>0 then
+	activatescreenshot=activatescreenshot-5
+	Graphics.fillRect(0,400,0,320,Color.new(255,255,255,activatescreenshot))
 end
-return answer
 end
 function freefunction()
 	Graphics.freeImage(Cookie)
@@ -120,8 +137,8 @@ end
 end
 function Cursor()
 	for i=1, CURSOR.count do
-	if i<=14 then 
-		Graphics.drawImageExtended(160, 120, 0, 0, 17, 180 ,-(CURSOR.rot+pi/7*i), 1.2,1.2, cursor)
+	if i<=12 then 
+		Graphics.drawImageExtended(160, 120, 0, 0, 17, 180 ,-(CURSOR.rot+pi/6*i), 1.2,1.2, cursor)
 	end
 	end
 end
@@ -170,9 +187,16 @@ function Temples()
 		end
 	end
 end
+function Towers()
+	for i=1, WIZARDTWR.count do
+		if i<=4 then 
+			Graphics.drawPartialImage(10+55*(i-1),5+BACK.y+71*WIZARDTWR.currency, 300, 0, 50, 50, ObjectsSheet)
+		end
+	end
+end
 function save()
 	savefile = io.open("/ccsave.sav",FCREATE)
-	savestring = COOKIE.count.."#"..GRANDMA.count.."#"..COOKIE.total.."#"..CURSOR.count.."#"..FARM.count.."#"..MINE.count.."#"..GRANDMA.currency.."#"..FARM.currency.."#"..MINE.currency.."#"..justcurrency.."#"..FACTORY.count.."#"..FACTORY.currency.."#"..BANK.count.."#"..BANK.currency.."#"..TEMPLE.count.."#"..TEMPLE.currency.."#"
+	savestring = COOKIE.count.."#"..GRANDMA.count.."#"..COOKIE.total.."#"..CURSOR.count.."#"..FARM.count.."#"..MINE.count.."#"..GRANDMA.currency.."#"..FARM.currency.."#"..MINE.currency.."#"..justcurrency.."#"..FACTORY.count.."#"..FACTORY.currency.."#"..BANK.count.."#"..BANK.currency.."#"..TEMPLE.count.."#"..TEMPLE.currency.."#"..WIZARDTWR.count.."#"..WIZARDTWR.currency.."#"
 	savestringlen = string.len(savestring)
 	io.write(savefile,0,savestring,savestringlen)
 	io.close(savefile)
@@ -200,6 +224,10 @@ function continue()
 		BANK.currency = tonumber(savearray[14]) or -1
 		TEMPLE.count = tonumber(savearray[15]) or 0
 		TEMPLE.currency = tonumber(savearray[16]) or -1
+		TEMPLE.count = tonumber(savearray[15]) or 0
+		TEMPLE.currency = tonumber(savearray[16]) or -1
+		WIZARDTWR.count = tonumber(savearray[17]) or 0
+		WIZARDTWR.currency = tonumber(savearray[18]) or -1
 	end
 end
 function ScreenButton(xbut,ybut,i,st)
@@ -207,17 +235,31 @@ function ScreenButton(xbut,ybut,i,st)
 		Buttons.sizey[i] = Graphics.getImageHeight(Buttons.texture[i])
 	if TOUCHx == 0 and TOUCHy==0 then 
 		if Buttons.dntch[st] == "YES" then
-			state=st
+			if st=="LOADALL" and CursorBuyIcon == nil then
+				loadall()
+			elseif st=="LOADALL" and CursorBuyIcon ~= nil then
+				Cookie = Graphics.loadImage(System.currentDirectory().."data/cookie.png")
+			elseif st=="SHOWAUTHOR" then
+				AUTHOR = 1
+			elseif st=="EXIT" then
+				Sound.close(bgm)
+				Sound.term()
+				System.exit()
+				freefunction()
+				bgm = nil
+				
+			elseif st=="RESET" then
+				System.deleteFile("/ccsave.sav")
+			else
+				state=st
+			end
 			Buttons.dntch[st] = "NO"
 			if st=="MENU1" then
-			save()
-			Cookie=nil
-			holdtoexit=0
-			state="MENU"
-			if System.doesFileExist("/ccsave.sav") then
-			MENU[1]="Continue"
-	end
-	end
+				save()
+				Cookie=nil
+				holdtoexit=0
+				state="MENU"
+		end
 		end
 		Graphics.drawImage(xbut,ybut,Buttons.texture[i])
 	else
@@ -240,10 +282,19 @@ function System.wait(milliseconds)
    while Timer.getTime(tmp) < milliseconds do end
    Timer.destroy(tmp)
 end
+loadmussic=1
 while true do
 	Screen.refresh()
 	Screen.clear(TOP_SCREEN)
 	Screen.clear(BOTTOM_SCREEN)
+	Screen.debugPrint(0,220,"NOW LOADING...",white,TOP_SCREEN)
+	
+	if loadmussic==1 then
+	System.wait(1000)
+	loadmussic = 0
+	loadmusic()
+	end
+
 	TOUCHx,TOUCHy = Controls.readTouch()
 	STICKx,STICKy = Controls.readCirclePad()
 	pad = Controls.read()
@@ -305,6 +356,13 @@ while true do
 	elseif COOKIE.total < 20000000 then
 		Graphics.drawPartialImage(STORE.x, STORE.y+198, 0, 198, 150, 33, ButtonsSheet,Shade)
 	end
+	if COOKIE.count >= WIZARDTWR.price then
+		Graphics.drawPartialImage(STORE.x, STORE.y+231, 150, 231, 150, 33, ButtonsSheet)
+	elseif COOKIE.total >= 330000000 and COOKIE.count<WIZARDTWR.price then
+		Graphics.drawPartialImage(STORE.x, STORE.y+231, 150, 231, 150, 33, ButtonsSheet,Shade)
+	elseif COOKIE.total < 330000000 then
+		Graphics.drawPartialImage(STORE.x, STORE.y+231, 0, 231, 150, 33, ButtonsSheet,Shade)
+	end
 	if GRANDMA.count>0 and BACK.y>=-10-71*GRANDMA.currency and BACK.y<200+71*GRANDMA.currency and GRANDMA.currency ~= -1 then
 	Graphics.drawPartialImage(BACK.x, BACK.y+71*GRANDMA.currency,0,0,242,71,BackgroundSprites)
 	Grandmother()
@@ -328,6 +386,10 @@ while true do
 	if TEMPLE.count>0 and BACK.y>=-10-71*TEMPLE.currency and BACK.y<200+71*TEMPLE.currency and TEMPLE.currency ~= -1 then
 	Graphics.drawPartialImage(BACK.x, BACK.y+71*TEMPLE.currency,0,355,242,71,BackgroundSprites)
 	Temples()
+	end
+	if WIZARDTWR.count>0 and BACK.y>=-10-71*WIZARDTWR.currency and BACK.y<200+71*WIZARDTWR.currency and WIZARDTWR.currency ~= -1 then
+	Graphics.drawPartialImage(BACK.x, BACK.y+71*WIZARDTWR.currency,0,426,242,71,BackgroundSprites)
+	Towers()
 	end
 	Graphics.drawImage(0, 0, StoreHead)
 	for i=1, batterylevel do
@@ -409,7 +471,9 @@ while true do
 	FACTORY.price=130000*1.15^FACTORY.count
 	BANK.price=1400000*1.15^BANK.count
 	TEMPLE.price=20000000*1.15^TEMPLE.count
+	WIZARDTWR.price=330000000*1.15^WIZARDTWR.count
 	Graphics.drawImage(254, 221, favicon)
+	screenshotmake()
 	Graphics.termBlend()
 	if STORE.stat==0 then 
 	Screen.debugPrint(260, 55,"Quantity - "..CURSOR.count.." ", Color.new(255,255,255), TOP_SCREEN) 
@@ -439,6 +503,10 @@ while true do
 	Screen.debugPrint(260, 55,"Quantity - "..TEMPLE.count.." ", Color.new(255,255,255), TOP_SCREEN)
 	Price = TEMPLE.price
 	end
+	if STORE.stat==7 then 
+	Screen.debugPrint(260, 55,"Quantity - "..WIZARDTWR.count.." ", Color.new(255,255,255), TOP_SCREEN)
+	Price = WIZARDTWR.price
+	end
 	if Price>COOKIE.count then
 	Screen.debugPrint(270, 224,math.floor(Price), red, TOP_SCREEN)
 	else
@@ -447,17 +515,16 @@ while true do
 	Screen.debugPrint(25, 10, math.floor(COOKIE.count).." Cookies                                                                                                       ", Color.new(255,255,255), TOP_SCREEN)
 	Screen.debugPrint(5, 30,"per second : "..CpS, Color.new(255,255,255), TOP_SCREEN)
 	Screen.debugPrint(5, 210,Th..":"..Tm, Color.new(255,255,255), TOP_SCREEN)
-	if batterylevel>=4 then BatteryColor = green end
-	if batterylevel>=2 and batterylevel<4 then BatteryColor = yellow end
-	if batterylevel>=0 and batterylevel<2 then BatteryColor = red end
+	
 	Graphics.initBlend(BOTTOM_SCREEN)
 	Graphics.drawImage(0, 0, BackgroundBottom)
 	Graphics.drawImageExtended(160, 120, 0, 0, 256, 256 ,SHINE.rot, 1,1, Shine)
 	Graphics.drawImageExtended(160, 120, 0, 0, 256, 256 ,-SHINE.rot, 1,1, Shine)
 	Graphics.drawImageExtended(160, 120, 0, 0, 128, 128 ,0, COOKIE.size,COOKIE.size, Cookie)
 	Graphics.drawImage(0, 0, Gradient)
-	ScreenButton(250,210,1,"MENU1")
+	ScreenButton(250,205,1,"MENU1")
 	Cursor()
+	screenshotmake()
 	Graphics.termBlend()
 	if STORE.y<86+33*(-STORE.stat) then 
 		STORE.y=STORE.y+11
@@ -478,7 +545,8 @@ while true do
 	CpSFactory=260*FACTORY.count
 	CpSBank=1400*BANK.count
 	CpSTemple=7800*TEMPLE.count
-	CpS=CpSCursor+CpSGrandma+CpSFarm+CpSMine+CpSFactory+CpSBank+CpSTemple
+	CpSWizard=44000*WIZARDTWR.count
+	CpS=CpSCursor+CpSGrandma+CpSFarm+CpSMine+CpSFactory+CpSBank+CpSTemple+CpSWizard
 	if Timer.getTime(timer)/100>=1 then
 		Timer.reset(timer)
 		COOKIE.count=COOKIE.count+CpS/10
@@ -488,6 +556,9 @@ while true do
 		Timer.reset(GetBattery)
 		Th,Tm,Ts = System.getTime()
 		batterylevel = System.getBatteryLife()
+		if batterylevel>=4 then BatteryColor = green end
+		if batterylevel>=2 and batterylevel<4 then BatteryColor = yellow end
+		if batterylevel>=0 and batterylevel<2 then BatteryColor = red end
 	end
 --[[	if Timer.getTime(saving)/60000>=1 then
 		autosaving(saving)
@@ -496,6 +567,7 @@ while true do
 	Graphics.initBlend(TOP_SCREEN)
 	Graphics.drawImage(0, 0, titlecreckeryop)
 	Graphics.fillRect(0,400,0,240,Color.new(0,0,0,rota))
+	screenshotmake()
 	Graphics.termBlend()
 	if rota>0 and rotanum==0 then
 	rota=rota-1
@@ -517,9 +589,6 @@ while true do
 	if startloading==0 and rotanum==2 then
 	state="MENU"
 	startloading=1
-	if System.doesFileExist("/ccsave.sav") then
-		MENU[1]="Continue"
-	end
 	end
 	if Controls.check(pad,KEY_START) and not Controls.check(oldpad,KEY_START) then
 		Sound.close(bgm)
@@ -527,19 +596,28 @@ while true do
 		System.exit()
 		freefunction()
 		bgm = nil
-		Font.unload(menufont)
+		
 	end 
 	elseif state=="MENU" then
 	Graphics.initBlend(TOP_SCREEN)
 	Graphics.drawImage(backx, backy, BackgroundTop1)
 	Graphics.drawImage(0, 0, menugradient)
 	Graphics.drawImage(0, 0, menutitle)
+	screenshotmake()
 	Graphics.termBlend()
 	Screen.debugPrint(300,220,"pre: "..version,white,TOP_SCREEN)
 	Graphics.initBlend(BOTTOM_SCREEN)
 	Graphics.drawImage(backx, backy, BackgroundTop1)
-	Graphics.fillRect(0,320,70+28*(MENU.stat-1),98+30*(MENU.stat-1),Color.new(0,0,0,150))
+	
+	ScreenButton(127,46,2,"LOADALL")
+	ScreenButton(0,147,3,"SHOWAUTHOR")
+	ScreenButton(130,161,4,"EXIT")
+	ScreenButton(116,120,5,"OPTIONS")
 	Graphics.drawImage(0, 0, gradient2)
+	if AUTHOR==1 then
+	Graphics.drawImage(83, 221, AUTHORTEXT)
+	end
+	screenshotmake()
 	Graphics.termBlend()
 	--[[backx=backx-2
 	backy=backy+1.2
@@ -547,64 +625,7 @@ while true do
 	backx = backx + 400
 	backy = backy - 240
 	end]]--
-	if Controls.check(pad,KEY_A) and Controls.check(oldpad,KEY_A) and MENU[MENU.stat]=="Exit" then
-	    Sound.close(bgm)
-		Sound.term()
-		System.exit()
-		freefunction()
-		bgm = nil
-		Font.unload(menufont)
-	end
-		for i=1, MENU.max do
-				Font.print(menufont,70,70+30*(i-1),MENU[i].."                                      ",white,BOTTOM_SCREEN)
-		end
-	if Controls.check(pad,KEY_DUP) and not Controls.check(oldpad,KEY_DUP) and MENU.stat>1 then
-		MENU.stat=MENU.stat-1
-	end
-	if Controls.check(pad,KEY_DDOWN) and not Controls.check(oldpad,KEY_DDOWN) and MENU.stat<MENU.max then
-		MENU.stat=MENU.stat+1
-	end
-	if Controls.check(pad,KEY_A) and (MENU[MENU.stat]=="New Game" or MENU[MENU.stat]=="Continue") and CursorBuyIcon == nil and presssing=="NOT PRESSED" then
-		loadall()
-	end
-	if Controls.check(pad,KEY_A) and Controls.check(oldpad,KEY_A) and MENU[MENU.stat]=="Options" and presssing=="NOT PRESSED" then
-		if System.doesFileExist("/ccsave.sav") then
-		MENU[1]="Erease data"
-		else
-		MENU[1]="Data Ereased"
-		end
-		MENU[2]="Back"
-		MENU.max = 2
-		MENU.stat = 1
-		presssing="PRESSED"
-	end
-		if System.doesFileExist("/ccsave.sav") and MENU[1]=="Data Ereased" then
-			MENU[1]="Erease data"
-		elseif MENU[1]=="Erease data" and System.doesFileExist("/ccsave.sav")==false then
-			MENU[1]="Data Ereased"
-		end
-	if Controls.check(pad,KEY_A) and Controls.check(oldpad,KEY_A) and MENU[MENU.stat]=="Erease data" and presssing=="NOT PRESSED" then
-		System.deleteFile("/ccsave.sav")
-		presssing="PRESSED"
-	end
-	if Controls.check(pad,KEY_A) and Controls.check(oldpad,KEY_A) and MENU[MENU.stat]=="Back" and presssing=="NOT PRESSED" then
-		MENU.max = 3
-		MENU.stat = 2
-		MENU[1]="New Game"
-		MENU[2]="Options"
-		MENU[3]="Exit"
-		if System.doesFileExist("/ccsave.sav") then
-		MENU[1]="Continue"
-		end
-		presssing="PRESSED"
-	end
-	if Controls.check(pad,KEY_A) then
-	else
-		presssing="NOT PRESSED"
-	end
-	if Controls.check(pad,KEY_A) and (MENU[MENU.stat]=="New Game" or MENU[MENU.stat]=="Continue") and CursorBuyIcon ~= nil then
-		Cookie = Graphics.loadImage(System.currentDirectory().."data/cookie.png")
-	end
+	
 	if Cookie == nil or Shine == nil or Gradient == nil or StoreHead == nil or pressed == nil or favicon == nil or cursor == nil or BackgroundSprites == nil or ObjectsSheet == nil or ButtonsSheet == nil then
 	else
 		justcurrency = 0
@@ -615,20 +636,46 @@ while true do
 		MINE = {price = 12000,count=0,random={},currency = -1}
 		FACTORY = {price = 130000,count=0,currency = -1}
 		BANK = {price = 1400000,count=0,currency = -1}
-		TEMPLE = {price = 1400000,count=0,currency = -1}
+		TEMPLE = {price = 20000000,count=0,currency = -1}
+		WIZARDTWR = {price = 330000000,count=0,currency = -1}
 		continue()
 		state="GAME"
 	end	
-	elseif state=="SAVED" then
-	Screen.debugPrint(0,0,"Your progress was saved.",white,TOP_SCREEN)
+	elseif state=="OPTIONS" then
+	Graphics.initBlend(TOP_SCREEN)
+	Graphics.drawImage(backx, backy, BackgroundTop1)
+	Graphics.drawImage(0, 0, menugradient)
+	Graphics.drawImage(0, 0, menutitle)
+	screenshotmake()
+	Graphics.termBlend()
+	Screen.debugPrint(300,220,"pre: "..version,white,TOP_SCREEN)
+	Graphics.initBlend(BOTTOM_SCREEN)
+	Graphics.drawImage(backx, backy, BackgroundTop1)
+	if System.doesFileExist("/ccsave.sav") then
+	ScreenButton(116,90,6,"RESET")
+	else
+	Graphics.drawImage(116,90,resetNET)
+	end
+	ScreenButton(130,131,1,"MENU")
+	ScreenButton(0,147,3,"SHOWAUTHOR")
+	Graphics.drawImage(0, 0, gradient2)
+	if AUTHOR==1 then
+	Graphics.drawImage(83, 221, AUTHORTEXT)
+	end
+	screenshotmake()
+	Graphics.termBlend()
+	
+	
+	
 end
-	if Controls.check(pad,KEY_L) and Controls.check(pad,KEY_R) then
-		R12=R12+1
-		System.takeScreenshot("/screenshot"..R12..".bmp",false)
+	if Controls.check(pad,KEY_L) and Controls.check(pad,KEY_R) and activatescreenshot==0  then
+		System.takeScreenshot("/CookieScreenshot-"..Tm.."-"..Ts..".bmp",false)
+		activatescreenshot=255
 	end
 	Screen.flip()
 	Screen.waitVblankStart()
 	oldpad = pad
+
 	--[[	-- Sets up HomeMenu syscall
 	if Controls.check(Controls.read(),KEY_HOME) or Controls.check(Controls.read(),KEY_POWER) then
 		save()
