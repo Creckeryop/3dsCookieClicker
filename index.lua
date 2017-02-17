@@ -5,12 +5,13 @@ yellow=Color.new(255,255,80)
 redformenu=Color.new(255,0,0)
 green=Color.new(80,255,80)
 white=Color.new(255,255,255)
+blue=Color.new(80,80,255)
 Th,Tm,Ts = System.getTime()
 math.randomseed(Th*3600+Tm*60+Ts)
+
 if System.currentDirectory() == "/" then
  System.currentDirectory("romfs:/")
 end
-
 
 titlecreckeryop= Graphics.loadImage(System.currentDirectory().."data/titlecreckeryop.png")
 menutitle= Graphics.loadImage(System.currentDirectory().."data/menutitle.png")
@@ -19,6 +20,7 @@ gradient2= Graphics.loadImage(System.currentDirectory().."data/gradient2.png")
 BackgroundTop = Graphics.loadImage(System.currentDirectory().."data/backgroundtop.png")
 BackgroundBottom = Graphics.loadImage(System.currentDirectory().."data/backgroundbottom.png")
 BackgroundTop1 = Graphics.loadImage(System.currentDirectory().."data/backgroundtop1.png")
+allsoldbanner = Graphics.loadImage(System.currentDirectory().."data/allsoldbanner.png")
 backON = Graphics.loadImage(System.currentDirectory().."data/backON.png")
 backOFF= Graphics.loadImage(System.currentDirectory().."data/backOFF.png")
 exitON = Graphics.loadImage(System.currentDirectory().."data/exitON.png")
@@ -33,16 +35,15 @@ resetON = Graphics.loadImage(System.currentDirectory().."data/resetON.png")
 resetOFF = Graphics.loadImage(System.currentDirectory().."data/resetOFF.png")
 resetNET = Graphics.loadImage(System.currentDirectory().."data/resetNET.png")
 AUTHORTEXT = Graphics.loadImage(System.currentDirectory().."data/AUTHOR.png")
-
+frameus = Graphics.loadImage(System.currentDirectory().."data/frameus.png")
 backx=0
 backy=0
 rota=255
 rotanum = 0
-version="0.6.5"
+version="0.7"
 Sound.init()
 function loadmusic()
 bgm = Sound.openOgg(System.currentDirectory().."data/bgm.ogg", false)
-
 Sound.play(bgm,LOOP)
 end
 R12=0
@@ -65,7 +66,7 @@ state="LOADING"
 Buttons={texture = {backON,playON,CMON,exitON,optionsON,resetON},texture2 = {backOFF,playOFF,CMOFF,exitOFF,optionsOFF,resetOFF},sizex={},sizey={},dntch={}}
 SHINE={}
 SHINE.rot=0
-SHINE.speed=0.005
+SHINE.speed=0.008
 MENU={stat=1,max=3,"New Game","Options","Exit"}
 justcurrency = 0
 COOKIE = {size=1,count=0,total=0}
@@ -79,6 +80,7 @@ holdtoexit = 0
 startloading=0 
 TOUCHALTER=0
 activatescreenshot=0
+status="BUY menu"
 function screenshotmake()
 if activatescreenshot>0 then
 	activatescreenshot=activatescreenshot-5
@@ -137,61 +139,114 @@ end
 end
 function Cursor()
 	for i=1, CURSOR.count do
-	if i<=12 then 
-		Graphics.drawImageExtended(160, 120, 0, 0, 17, 180 ,-(CURSOR.rot+pi/6*i), 1.2,1.2, cursor)
+	if i<=10 then 
+		Graphics.drawImageExtended(160, 120, 0, 0, 17, 180 ,-(CURSOR.rot+pi/5*i), 1.2,1.2, cursor)
 	end
 	end
 end
 function Grandmother()
-	for i=1, GRANDMA.count do
-		if i<=6 then 
-			Graphics.drawPartialImage(35*(i-1),8+BACK.y+71*GRANDMA.currency, 0, 0, 50, 50, ObjectsSheet)
-		
+	if GRANDMA.count<=6 and GRANDMA.count>0 then
+		for i=1, GRANDMA.count do
+			if i<=6 then 
+				Graphics.drawPartialImage(2+40*(i-1),12+BACK.y+71*GRANDMA.currency, 0, 0, 50, 50, ObjectsSheet)
+			end
 		end
+	elseif GRANDMA.count>6 then
+		for i=1,6 do
+				Graphics.drawPartialImage(2+40*(i-1),12+BACK.y+71*GRANDMA.currency, 0, 0, 50, 50, ObjectsSheet)
+		end
+	elseif GRANDMA.count==0 then
+		Graphics.drawImage(81,17+BACK.y+71*GRANDMA.currency,allsoldbanner)
 	end
 end
 function Farms()
-	for i=1, FARM.count do
-		if i<=4 then 
+	if FARM.count<=4 and FARM.count>0then
+		for i=1, FARM.count do
+			if i<=4 then 
+				Graphics.drawPartialImage(10+55*(i-1),12+BACK.y+71*FARM.currency, 50, 0, 50, 50, ObjectsSheet)
+			end
+		end
+	elseif FARM.count>4 then
+		for i=1,4 do
 				Graphics.drawPartialImage(10+55*(i-1),12+BACK.y+71*FARM.currency, 50, 0, 50, 50, ObjectsSheet)
 		end
+	elseif FARM.count==0 then
+		Graphics.drawImage(81,17+BACK.y+71*FARM.currency,allsoldbanner)
 	end
 end
 function Mines()
-	for i=1,MINE.count do
-		if i<=4 then 
-			MINE.random[i]=MINE.random[i] or math.random(0,8)
-			Graphics.drawPartialImage(10+55*(i-1),12+BACK.y+71*MINE.currency-MINE.random[i], 100, 0, 50, 50, ObjectsSheet)
+	if MINE.count<=4 and MINE.count>0 then
+		for i=1, MINE.count do
+			if i<=4 then 
+				Graphics.drawPartialImage(10+55*(i-1),12+BACK.y+71*MINE.currency, 100, 0, 50, 50, ObjectsSheet)
+			end
 		end
+	elseif MINE.count>4 then
+		for i=1,4 do
+				Graphics.drawPartialImage(10+55*(i-1),12+BACK.y+71*MINE.currency, 100, 0, 50, 50, ObjectsSheet)
+		end
+	elseif MINE.count==0 then
+		Graphics.drawImage(81,17+BACK.y+71*MINE.currency,allsoldbanner)
 	end
 end
 function Factories()
-	for i=1, FACTORY.count do
-		if i<=4 then 
-			Graphics.drawPartialImage(10+55*(i-1),5+BACK.y+71*FACTORY.currency, 150, 0, 50, 50, ObjectsSheet)
+	if FACTORY.count<=4 and FACTORY.count>0 then
+		for i=1, FACTORY.count do
+			if i<=4 then 
+				Graphics.drawPartialImage(10+55*(i-1),12+BACK.y+71*FACTORY.currency, 150, 0, 50, 50, ObjectsSheet)
+			end
 		end
+	elseif FACTORY.count>4 then
+		for i=1,4 do
+				Graphics.drawPartialImage(10+55*(i-1),12+BACK.y+71*FACTORY.currency, 150, 0, 50, 50, ObjectsSheet)
+		end
+	elseif FACTORY.count==0 then
+		Graphics.drawImage(81,17+BACK.y+71*FACTORY.currency,allsoldbanner)
 	end
 end
 function Banks()
-
-	for i=1, BANK.count do
-		if i<=4 then 
-			Graphics.drawPartialImage(10+55*(i-1),5+BACK.y+71*BANK.currency, 200, 0, 50, 50, ObjectsSheet)
+	if BANK.count<=4 and BANK.count>0 then
+		for i=1, BANK.count do
+			if i<=4 then 
+				Graphics.drawPartialImage(10+55*(i-1),12+BACK.y+71*BANK.currency, 200, 0, 50, 50, ObjectsSheet)
+			end
 		end
+	elseif BANK.count>4 then
+		for i=1,4 do
+				Graphics.drawPartialImage(10+55*(i-1),12+BACK.y+71*BANK.currency, 200, 0, 50, 50, ObjectsSheet)
+		end
+	elseif BANK.count==0 then
+		Graphics.drawImage(81,17+BACK.y+71*BANK.currency,allsoldbanner)
 	end
 end
 function Temples()
-	for i=1, TEMPLE.count do
-		if i<=4 then 
-			Graphics.drawPartialImage(10+55*(i-1),5+BACK.y+71*TEMPLE.currency, 250, 0, 50, 50, ObjectsSheet)
+	if TEMPLE.count<=4 and TEMPLE.count>0 then
+		for i=1, TEMPLE.count do
+			if i<=4 then 
+				Graphics.drawPartialImage(10+55*(i-1),12+BACK.y+71*TEMPLE.currency, 250, 0, 50, 50, ObjectsSheet)
+			end
 		end
+	elseif TEMPLE.count>4 then
+		for i=1,4 do
+				Graphics.drawPartialImage(10+55*(i-1),12+BACK.y+71*TEMPLE.currency, 250, 0, 50, 50, ObjectsSheet)
+		end
+	elseif TEMPLE.count==0 then
+		Graphics.drawImage(81,17+BACK.y+71*TEMPLE.currency,allsoldbanner)
 	end
 end
 function Towers()
-	for i=1, WIZARDTWR.count do
-		if i<=4 then 
-			Graphics.drawPartialImage(10+55*(i-1),5+BACK.y+71*WIZARDTWR.currency, 300, 0, 50, 50, ObjectsSheet)
+	if WIZARDTWR.count<=4 and WIZARDTWR.count>0 then
+		for i=1, WIZARDTWR.count do
+			if i<=4 then 
+				Graphics.drawPartialImage(10+55*(i-1),12+BACK.y+71*WIZARDTWR.currency, 300, 0, 50, 50, ObjectsSheet)
+			end
 		end
+	elseif WIZARDTWR.count>4 then
+		for i=1,4 do
+				Graphics.drawPartialImage(10+55*(i-1),12+BACK.y+71*WIZARDTWR.currency, 300, 0, 50, 50, ObjectsSheet)
+		end
+	elseif WIZARDTWR.count==0 then
+		Graphics.drawImage(81,17+BACK.y+71*WIZARDTWR.currency,allsoldbanner)
 	end
 end
 function save()
@@ -287,14 +342,13 @@ while true do
 	Screen.refresh()
 	Screen.clear(TOP_SCREEN)
 	Screen.clear(BOTTOM_SCREEN)
-	Screen.debugPrint(0,220,"NOW LOADING...",white,TOP_SCREEN)
 	
 	if loadmussic==1 then
+	Screen.debugPrint(0,220,"NOW LOADING...",white,TOP_SCREEN)
 	System.wait(1000)
 	loadmussic = 0
 	loadmusic()
 	end
-
 	TOUCHx,TOUCHy = Controls.readTouch()
 	STICKx,STICKy = Controls.readCirclePad()
 	pad = Controls.read()
@@ -363,31 +417,31 @@ while true do
 	elseif COOKIE.total < 330000000 then
 		Graphics.drawPartialImage(STORE.x, STORE.y+231, 0, 231, 150, 33, ButtonsSheet,Shade)
 	end
-	if GRANDMA.count>0 and BACK.y>=-10-71*GRANDMA.currency and BACK.y<200+71*GRANDMA.currency and GRANDMA.currency ~= -1 then
+	if BACK.y>=-10-71*GRANDMA.currency and BACK.y<200+71*GRANDMA.currency and GRANDMA.currency ~= -1 then
 	Graphics.drawPartialImage(BACK.x, BACK.y+71*GRANDMA.currency,0,0,242,71,BackgroundSprites)
 	Grandmother()
 	end
-	if FARM.count>0 and BACK.y>=-10-71*FARM.currency and BACK.y<200+71*FARM.currency and FARM.currency ~= -1 then
+	if BACK.y>=-10-71*FARM.currency and BACK.y<200+71*FARM.currency and FARM.currency ~= -1 then
 	Graphics.drawPartialImage(BACK.x, BACK.y+71*FARM.currency,0,71,242,71,BackgroundSprites)
 	Farms()
 	end
-	if MINE.count>0 and BACK.y>=-10-71*MINE.currency and BACK.y<200+71*MINE.currency and MINE.currency ~= -1 then
+	if BACK.y>=-10-71*MINE.currency and BACK.y<200+71*MINE.currency and MINE.currency ~= -1 then
 	Graphics.drawPartialImage(BACK.x, BACK.y+71*MINE.currency,0,142,242,71,BackgroundSprites)
 	Mines()
 	end
-	if FACTORY.count>0 and BACK.y>=-10-71*FACTORY.currency and BACK.y<200+71*FACTORY.currency and  FACTORY.currency ~= -1 then
+	if BACK.y>=-10-71*FACTORY.currency and BACK.y<200+71*FACTORY.currency and  FACTORY.currency ~= -1 then
 	Graphics.drawPartialImage(BACK.x, BACK.y+71*FACTORY.currency,0,213,242,71,BackgroundSprites)
 	Factories()
 	end
-	if BANK.count>0 and BACK.y>=-10-71*BANK.currency and BACK.y<200+71*BANK.currency and BANK.currency ~= -1 then
+	if BACK.y>=-10-71*BANK.currency and BACK.y<200+71*BANK.currency and BANK.currency ~= -1 then
 	Graphics.drawPartialImage(BACK.x, BACK.y+71*BANK.currency,0,284,242,71,BackgroundSprites)
 	Banks()
 	end
-	if TEMPLE.count>0 and BACK.y>=-10-71*TEMPLE.currency and BACK.y<200+71*TEMPLE.currency and TEMPLE.currency ~= -1 then
+	if BACK.y>=-10-71*TEMPLE.currency and BACK.y<200+71*TEMPLE.currency and TEMPLE.currency ~= -1 then
 	Graphics.drawPartialImage(BACK.x, BACK.y+71*TEMPLE.currency,0,355,242,71,BackgroundSprites)
 	Temples()
 	end
-	if WIZARDTWR.count>0 and BACK.y>=-10-71*WIZARDTWR.currency and BACK.y<200+71*WIZARDTWR.currency and WIZARDTWR.currency ~= -1 then
+	if BACK.y>=-10-71*WIZARDTWR.currency and BACK.y<200+71*WIZARDTWR.currency and WIZARDTWR.currency ~= -1 then
 	Graphics.drawPartialImage(BACK.x, BACK.y+71*WIZARDTWR.currency,0,426,242,71,BackgroundSprites)
 	Towers()
 	end
@@ -405,6 +459,7 @@ while true do
 	BACK.y=62
 	end
 	Graphics.drawImage(5,7,favicon)
+	if status=="BUY menu" then
 	if Controls.check(pad,KEY_A) and not Controls.check(oldpad,KEY_A) and STORE.stat==0 and COOKIE.count >= CURSOR.price then
 		Graphics.drawImage(STORE.x, STORE.y+33*STORE.stat, pressed)
 		CURSOR.count=CURSOR.count+1
@@ -464,7 +519,67 @@ while true do
 		justcurrency = justcurrency+1
 		end
 	end
-	CURSOR.price=15*1.15^CURSOR.count
+	if Controls.check(pad,KEY_A) and not Controls.check(oldpad,KEY_A) and STORE.stat==7 and COOKIE.count >= WIZARDTWR.price then
+		Graphics.drawImage(STORE.x, STORE.y+33*STORE.stat, pressed)
+		WIZARDTWR.count=WIZARDTWR.count+1
+		COOKIE.count=COOKIE.count-WIZARDTWR.price
+		if WIZARDTWR.currency == -1 then 
+		WIZARDTWR.currency = justcurrency 
+		justcurrency = justcurrency+1
+		end
+	end
+	end
+	if status=="SELL menu" then
+	if Controls.check(pad,KEY_A) and not Controls.check(oldpad,KEY_A) and STORE.stat==0 and CURSOR.count > 0 then
+		Graphics.drawImage(STORE.x, STORE.y+33*STORE.stat, pressed)
+		CURSOR.count=CURSOR.count-1
+		COOKIE.count=COOKIE.count+CURSOR.sellprice
+	end
+	if Controls.check(pad,KEY_A) and not Controls.check(oldpad,KEY_A) and STORE.stat==1 and GRANDMA.count > 0 then
+		Graphics.drawImage(STORE.x, STORE.y+33*STORE.stat, pressed)
+		GRANDMA.count=GRANDMA.count-1
+		COOKIE.count=COOKIE.count+GRANDMA.sellprice
+	end
+	if Controls.check(pad,KEY_A) and not Controls.check(oldpad,KEY_A) and STORE.stat==2 and FARM.count > 0 then
+		Graphics.drawImage(STORE.x, STORE.y+33*STORE.stat, pressed)
+		FARM.count=FARM.count-1
+		COOKIE.count=COOKIE.count+FARM.sellprice
+	end
+	if Controls.check(pad,KEY_A) and not Controls.check(oldpad,KEY_A) and STORE.stat==3 and MINE.count > 0 then
+		Graphics.drawImage(STORE.x, STORE.y+33*STORE.stat, pressed)
+		MINE.count=MINE.count-1
+		COOKIE.count=COOKIE.count+MINE.sellprice
+	end
+	if Controls.check(pad,KEY_A) and not Controls.check(oldpad,KEY_A) and STORE.stat==4 and FACTORY.count > 0 then
+		Graphics.drawImage(STORE.x, STORE.y+33*STORE.stat, pressed)
+		FACTORY.count=FACTORY.count-1
+		COOKIE.count=COOKIE.count+FACTORY.sellprice
+	end
+	if Controls.check(pad,KEY_A) and not Controls.check(oldpad,KEY_A) and STORE.stat==5 and BANK.count > 0 then
+		Graphics.drawImage(STORE.x, STORE.y+33*STORE.stat, pressed)
+		BANK.count=BANK.count-1
+		COOKIE.count=COOKIE.count+BANK.sellprice
+	end
+	if Controls.check(pad,KEY_A) and not Controls.check(oldpad,KEY_A) and STORE.stat==6 and TEMPLE.count > 0 then
+		Graphics.drawImage(STORE.x, STORE.y+33*STORE.stat, pressed)
+		TEMPLE.count=TEMPLE.count-1
+		COOKIE.count=COOKIE.count+TEMPLE.sellprice
+	end
+	if Controls.check(pad,KEY_A) and not Controls.check(oldpad,KEY_A) and STORE.stat==7 and WIZARDTWR.count > 0 then
+		Graphics.drawImage(STORE.x, STORE.y+33*STORE.stat, pressed)
+		WIZARDTWR.count=WIZARDTWR.count-1
+		COOKIE.count=COOKIE.count+WIZARDTWR.sellprice
+	end
+	end
+	CURSOR.sellprice=math.ceil(15*1.15^(CURSOR.count-1)/2)
+	GRANDMA.sellprice=math.ceil(100*1.15^(GRANDMA.count-1)/2)
+	FARM.sellprice=math.ceil(1000*1.15^(FARM.count-1)/2)
+	MINE.sellprice=math.ceil(12000*1.15^(MINE.count-1)/2)
+	FACTORY.sellprice=math.ceil(130000*1.15^(FACTORY.count-1)/2)
+	BANK.sellprice=math.ceil(1400000*1.15^(BANK.count-1)/2)
+	TEMPLE.sellprice=math.ceil(20000000*1.15^(TEMPLE.count-1)/2)
+	WIZARDTWR.sellprice=math.ceil(330000000*1.15^(WIZARDTWR.count-1)/2)
+	CURSOR.price=15*1.15^CURSOR.count	
 	GRANDMA.price=100*1.15^GRANDMA.count
 	FARM.price=1000*1.15^FARM.count
 	MINE.price=12000*1.15^MINE.count
@@ -473,48 +588,107 @@ while true do
 	TEMPLE.price=20000000*1.15^TEMPLE.count
 	WIZARDTWR.price=330000000*1.15^WIZARDTWR.count
 	Graphics.drawImage(254, 221, favicon)
+	if status=="SELL menu" then
+		Graphics.drawImage(250, 86, frameus)
+	end
 	screenshotmake()
 	Graphics.termBlend()
+	if Controls.check(pad,KEY_SELECT) and not Controls.check(oldpad,KEY_SELECT) and status=="BUY menu" then
+		status="SELL menu"
+	
+	elseif Controls.check(pad,KEY_SELECT) and not Controls.check(oldpad,KEY_SELECT) and status=="SELL menu" then
+		status="BUY menu"
+	
+	end
+	if status=="BUY menu" then
+		Screen.debugPrint(255, 47,"    BUY menu", green, TOP_SCREEN)
+	elseif status=="SELL menu" then
+		Screen.debugPrint(255, 47,"    SELL menu", blue, TOP_SCREEN)
+	end
 	if STORE.stat==0 then 
-	Screen.debugPrint(260, 55,"Quantity - "..CURSOR.count.." ", Color.new(255,255,255), TOP_SCREEN) 
+	Screen.debugPrint(205, 47,CURSOR.count, white, TOP_SCREEN) 
+	if status=="BUY menu" then
 	Price = CURSOR.price
+	elseif status=="SELL menu" then
+	Price = CURSOR.sellprice
+	end
 	end
 	if STORE.stat==1 then 
-	Screen.debugPrint(260, 55,"Quantity - "..GRANDMA.count.." ", Color.new(255,255,255), TOP_SCREEN)
+	Screen.debugPrint(205, 47,GRANDMA.count, white, TOP_SCREEN)
+	if status=="BUY menu" then
 	Price = GRANDMA.price
+	elseif status=="SELL menu" then
+	Price = GRANDMA.sellprice
+	end
 	end
 	if STORE.stat==2 then 
-	Screen.debugPrint(260, 55,"Quantity - "..FARM.count.." ", Color.new(255,255,255), TOP_SCREEN)
+	Screen.debugPrint(205, 47,FARM.count,white, TOP_SCREEN)
+	if status=="BUY menu" then
 	Price = FARM.price
+	elseif status=="SELL menu" then
+	Price = FARM.sellprice
+	end
 	end
 	if STORE.stat==3 then 
-	Screen.debugPrint(260, 55,"Quantity - "..MINE.count.." ", Color.new(255,255,255), TOP_SCREEN)
+	Screen.debugPrint(205, 47,MINE.count, white, TOP_SCREEN)
+	if status=="BUY menu" then
 	Price = MINE.price
+	elseif status=="SELL menu" then
+	Price = MINE.sellprice
+	end
 	end
 	if STORE.stat==4 then 
-	Screen.debugPrint(260, 55,"Quantity - "..FACTORY.count.." ", Color.new(255,255,255), TOP_SCREEN)
+	Screen.debugPrint(205, 47,FACTORY.count, white, TOP_SCREEN)
+	if status=="BUY menu" then
 	Price = FACTORY.price
+	elseif status=="SELL menu" then
+	Price = FACTORY.sellprice
+	end
 	end
 	if STORE.stat==5 then 
-	Screen.debugPrint(260, 55,"Quantity - "..BANK.count.." ", Color.new(255,255,255), TOP_SCREEN)
+	Screen.debugPrint(205, 47,BANK.count, white, TOP_SCREEN)
+	if status=="BUY menu" then
 	Price = BANK.price
+	elseif status=="SELL menu" then
+	Price = BANK.sellprice
+	end
 	end
 	if STORE.stat==6 then 
-	Screen.debugPrint(260, 55,"Quantity - "..TEMPLE.count.." ", Color.new(255,255,255), TOP_SCREEN)
+	Screen.debugPrint(205, 47,TEMPLE.count, white, TOP_SCREEN)
+	if status=="BUY menu" then
 	Price = TEMPLE.price
+	elseif status=="SELL menu" then
+	Price = TEMPLE.sellprice
+	end
 	end
 	if STORE.stat==7 then 
-	Screen.debugPrint(260, 55,"Quantity - "..WIZARDTWR.count.." ", Color.new(255,255,255), TOP_SCREEN)
+	Screen.debugPrint(205, 47,WIZARDTWR.count,white, TOP_SCREEN)
+	if status=="BUY menu" then
 	Price = WIZARDTWR.price
+	elseif status=="SELL menu" then
+	Price = WIZARDTWR.sellprice
 	end
+	end
+	
+	
+	Screen.debugPrint(253, 61,"  press SELECT ", white, TOP_SCREEN)
+	if status=="BUY menu" then
 	if Price>COOKIE.count then
 	Screen.debugPrint(270, 224,math.floor(Price), red, TOP_SCREEN)
 	else
 	Screen.debugPrint(270, 224,math.floor(Price), green, TOP_SCREEN)
 	end
+	end
+	if status=="SELL menu" then
+	Screen.debugPrint(270, 224,math.floor(Price), blue, TOP_SCREEN)
+	end
 	Screen.debugPrint(25, 10, math.floor(COOKIE.count).." Cookies                                                                                                       ", Color.new(255,255,255), TOP_SCREEN)
-	Screen.debugPrint(5, 30,"per second : "..CpS, Color.new(255,255,255), TOP_SCREEN)
-	Screen.debugPrint(5, 210,Th..":"..Tm, Color.new(255,255,255), TOP_SCREEN)
+	Screen.debugPrint(5, 30,"per second : "..CpS, white, TOP_SCREEN)
+	if string.len(Tm)==2 then
+	Screen.debugPrint(5, 210,Th..":"..Tm, blue, TOP_SCREEN)
+	else
+	Screen.debugPrint(5, 210,Th..":0"..Tm, blue, TOP_SCREEN)
+	end
 	
 	Graphics.initBlend(BOTTOM_SCREEN)
 	Graphics.drawImage(0, 0, BackgroundBottom)
@@ -557,8 +731,8 @@ while true do
 		Th,Tm,Ts = System.getTime()
 		batterylevel = System.getBatteryLife()
 		if batterylevel>=4 then BatteryColor = green end
-		if batterylevel>=2 and batterylevel<4 then BatteryColor = yellow end
-		if batterylevel>=0 and batterylevel<2 then BatteryColor = red end
+		if batterylevel>=3 and batterylevel<4 then BatteryColor = yellow end
+		if batterylevel>=0 and batterylevel<3 then BatteryColor = red end
 	end
 --[[	if Timer.getTime(saving)/60000>=1 then
 		autosaving(saving)
@@ -614,7 +788,7 @@ while true do
 	ScreenButton(130,161,4,"EXIT")
 	ScreenButton(116,120,5,"OPTIONS")
 	Graphics.drawImage(0, 0, gradient2)
-	if AUTHOR==1 then
+	if AUTHOR==2 then
 	Graphics.drawImage(83, 221, AUTHORTEXT)
 	end
 	screenshotmake()
@@ -659,7 +833,7 @@ while true do
 	ScreenButton(130,131,1,"MENU")
 	ScreenButton(0,147,3,"SHOWAUTHOR")
 	Graphics.drawImage(0, 0, gradient2)
-	if AUTHOR==1 then
+	if AUTHOR==2 then
 	Graphics.drawImage(83, 221, AUTHORTEXT)
 	end
 	screenshotmake()
@@ -675,7 +849,6 @@ end
 	Screen.flip()
 	Screen.waitVblankStart()
 	oldpad = pad
-
 	--[[	-- Sets up HomeMenu syscall
 	if Controls.check(Controls.read(),KEY_HOME) or Controls.check(Controls.read(),KEY_POWER) then
 		save()
