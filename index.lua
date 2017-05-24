@@ -5,14 +5,80 @@ yellow=Color.new(255,255,80)
 redformenu=Color.new(255,0,0)
 green=Color.new(80,255,80)
 white=Color.new(255,255,255)
+WhiteShade=Color.new(255,255,255,100)
 blue=Color.new(80,80,255)
 Th,Tm,Ts = System.getTime()
 math.randomseed(Th*3600+Tm*60+Ts)
-
+img_font = Graphics.loadImage(System.currentDirectory().."data/Font.png")
+glyph_l = {}
+glyph_r = {}
+glyph_w = {}
+function g_init(char, l, r) --this saves to an array the left and right pixels, as well as the width of each character, and the character's string is the index
+    glyph_l[char] = l
+    glyph_r[char] = r
+    glyph_w[char] = r-l+1
+end
+--glyph_w = {} --precalculate this so it's faster on the text drawing system
+g_init('0',0,5)
+g_init('1',6,9)
+g_init('2',10,15)
+g_init('3',16,21)
+g_init('4',22,27)
+g_init('5',28,33)
+g_init('6',34,39)
+g_init('7',40,45)
+g_init('8',46,51)
+g_init('9',52,57)
+g_init('A',58,63)
+g_init('B',64,69)
+g_init('C',70,75)
+g_init('D',76,81)
+g_init('E',82,87)
+g_init('F',88,93)
+g_init('G',94,99)
+g_init('H',100,105)
+g_init('I',106,109)
+g_init('J',110,115)
+g_init('K',116,121)
+g_init('L',122,127)
+g_init('M',128,133)
+g_init('N',134,139)
+g_init('O',140,145)
+g_init('P',146,151)
+g_init('Q',152,157)
+g_init('R',158,163)
+g_init('S',164,169)
+g_init('T',170,175)
+g_init('U',176,181)
+g_init('V',182,187)
+g_init('W',188,193)
+g_init('X',194,199)
+g_init('Y',200,205)
+g_init('Z',206,211)
+g_init('.',212,213)
+g_init(' ',213,213)
+g_init(':',215,216)
+g_init('-',217,219)
+function gpu_drawtext(x, y, text, font_color)
+    local text_u = string.upper(text) --my font system is caps-only.
+    local i_str=0 --the current position in the string
+    local i_chr='' --the current character in the string
+    local str_width = 0 --width in pixels of the string
+    local str_length = string.len(text)
+    local cw --character width
+    while i_str < str_length do
+        i_str = i_str + 1
+        i_chr = string.sub(text_u, i_str, i_str)
+        cw = glyph_w[i_chr]
+        if cw ~= nil then --as long as the character exists
+            Graphics.drawPartialImage(x+str_width, y, glyph_l[i_chr], 0, cw, 10, img_font, font_color)
+            str_width = str_width + cw + 1
+        end
+    end
+end
 if System.currentDirectory() == "/" then
  System.currentDirectory("romfs:/")
 end
-
 titlecreckeryop= Graphics.loadImage(System.currentDirectory().."data/titlecreckeryop.png")
 menutitle= Graphics.loadImage(System.currentDirectory().."data/menutitle.png")
 menugradient= Graphics.loadImage(System.currentDirectory().."data/menugradient.png")
@@ -40,7 +106,7 @@ backx=0
 backy=0
 rota=255
 rotanum = 0
-version="0.7"
+version="0.8"
 Sound.init()
 function loadmusic()
 bgm = Sound.openOgg(System.currentDirectory().."data/bgm.ogg", false)
@@ -139,8 +205,8 @@ end
 end
 function Cursor()
 	for i=1, CURSOR.count do
-	if i<=10 then 
-		Graphics.drawImageExtended(160, 120, 0, 0, 17, 180 ,-(CURSOR.rot+pi/5*i), 1.2,1.2, cursor)
+	if i<=6 then 
+		Graphics.drawImageExtended(160, 120, 0, 0, 17, 180 ,-(CURSOR.rot+pi/3*i), 1.2,1.2, cursor)
 	end
 	end
 end
@@ -361,58 +427,58 @@ while true do
 	TOUCHCHECK()
 	Graphics.initBlend(TOP_SCREEN)
 	Graphics.drawImage(0, 0, BackgroundTop)
-	if COOKIE.count >= CURSOR.price then
+	if status=="BUY menu" and COOKIE.count >= CURSOR.price or (status=="SELL menu" and CURSOR.count>0) then
 		Graphics.drawPartialImage(STORE.x, STORE.y, 150, 0, 150, 33, ButtonsSheet)
-	elseif COOKIE.total >= 15 and COOKIE.count<CURSOR.price then
+	elseif COOKIE.total >= 15 and COOKIE.count<CURSOR.price or (status=="SELL menu" and CURSOR.count==0 and COOKIE.total > 15) then
 		Graphics.drawPartialImage(STORE.x, STORE.y, 150, 0, 150, 33, ButtonsSheet,Shade)
 	elseif COOKIE.total < 15 then
 		Graphics.drawPartialImage(STORE.x, STORE.y, 0, 0, 150, 33, ButtonsSheet,Shade)
 	end
-	if COOKIE.count >= GRANDMA.price then
+	if status=="BUY menu" and COOKIE.count >= GRANDMA.price or (status=="SELL menu" and GRANDMA.count>0) then
 		Graphics.drawPartialImage(STORE.x, STORE.y+33, 150, 33, 150, 33, ButtonsSheet)
-	elseif COOKIE.total >= 100 and COOKIE.count<GRANDMA.price then
+	elseif COOKIE.total >= 100 and COOKIE.count<GRANDMA.price or (status=="SELL menu" and GRANDMA.count==0 and COOKIE.total > 100) then
 		Graphics.drawPartialImage(STORE.x, STORE.y+33, 150, 33, 150, 33, ButtonsSheet,Shade)
-	elseif COOKIE.total < 100 then
+		elseif COOKIE.total < 100 then
 		Graphics.drawPartialImage(STORE.x, STORE.y+33, 0, 33, 150, 33, ButtonsSheet,Shade)
 	end
-	if COOKIE.count >= FARM.price then
+	if status=="BUY menu" and COOKIE.count >= FARM.price or (status=="SELL menu" and FARM.count>0) then
 		Graphics.drawPartialImage(STORE.x, STORE.y+66, 150, 66, 150, 33, ButtonsSheet)
-	elseif COOKIE.total >= 1000 and COOKIE.count<FARM.price then
+	elseif COOKIE.total >= 1000 and COOKIE.count<FARM.price or (status=="SELL menu" and FARM.count==0 and COOKIE.total > 1000) then
 		Graphics.drawPartialImage(STORE.x, STORE.y+66, 150, 66, 150, 33, ButtonsSheet,Shade)
 	elseif COOKIE.total < 1000 then
 		Graphics.drawPartialImage(STORE.x, STORE.y+66, 0, 66, 150, 33, ButtonsSheet,Shade)
 	end
-	if COOKIE.count >= MINE.price then
+	if status=="BUY menu" and COOKIE.count >= MINE.price or (status=="SELL menu" and MINE.count>0) then
 		Graphics.drawPartialImage(STORE.x, STORE.y+99, 150, 99, 150, 33, ButtonsSheet)
-	elseif COOKIE.total >= 12000 and COOKIE.count<MINE.price then
+	elseif COOKIE.total >= 12000 and COOKIE.count<MINE.price or (status=="SELL menu" and MINE.count==0 and COOKIE.total > 12000) then
 		Graphics.drawPartialImage(STORE.x, STORE.y+99, 150, 99, 150, 33, ButtonsSheet,Shade)
 	elseif COOKIE.total < 12000 then
 		Graphics.drawPartialImage(STORE.x, STORE.y+99, 0, 99, 150, 33, ButtonsSheet,Shade)
-	end
-	if COOKIE.count >= FACTORY.price then
+	end	
+	if status=="BUY menu" and COOKIE.count >= FACTORY.price or (status=="SELL menu" and FACTORY.count>0) then
 		Graphics.drawPartialImage(STORE.x, STORE.y+132, 150, 132, 150, 33, ButtonsSheet)
-	elseif COOKIE.total >= 130000 and COOKIE.count<FACTORY.price then
+	elseif COOKIE.total >= 130000 and COOKIE.count<FACTORY.price or (status=="SELL menu" and FACTORY.count==0 and COOKIE.total > 130000) then
 		Graphics.drawPartialImage(STORE.x, STORE.y+132, 150, 132, 150, 33, ButtonsSheet,Shade)
 	elseif COOKIE.total < 130000 then
 		Graphics.drawPartialImage(STORE.x, STORE.y+132, 0, 132, 150, 33, ButtonsSheet,Shade)
 	end
-	if COOKIE.count >= BANK.price then
+	if status=="BUY menu" and COOKIE.count >= BANK.price or (status=="SELL menu" and BANK.count>0) then
 		Graphics.drawPartialImage(STORE.x, STORE.y+165, 150, 165, 150, 33, ButtonsSheet)
-	elseif COOKIE.total >= 1400000 and COOKIE.count<BANK.price then
+	elseif COOKIE.total >= 1400000 and COOKIE.count<BANK.price or (status=="SELL menu" and BANK.count==0 and COOKIE.total > 1400000) then
 		Graphics.drawPartialImage(STORE.x, STORE.y+165, 150, 165, 150, 33, ButtonsSheet,Shade)
 	elseif COOKIE.total < 1400000 then
 		Graphics.drawPartialImage(STORE.x, STORE.y+165, 0, 165, 150, 33, ButtonsSheet,Shade)
 	end
-	if COOKIE.count >= TEMPLE.price then
+	if status=="BUY menu" and COOKIE.count >= TEMPLE.price or (status=="SELL menu" and TEMPLE.count>0) then
 		Graphics.drawPartialImage(STORE.x, STORE.y+198, 150, 198, 150, 33, ButtonsSheet)
-	elseif COOKIE.total >= 20000000 and COOKIE.count<TEMPLE.price then
+	elseif COOKIE.total >= 20000000 and COOKIE.count<TEMPLE.price or (status=="SELL menu" and TEMPLE.count==0 and COOKIE.total > 20000000) then
 		Graphics.drawPartialImage(STORE.x, STORE.y+198, 150, 198, 150, 33, ButtonsSheet,Shade)
 	elseif COOKIE.total < 20000000 then
 		Graphics.drawPartialImage(STORE.x, STORE.y+198, 0, 198, 150, 33, ButtonsSheet,Shade)
 	end
-	if COOKIE.count >= WIZARDTWR.price then
+	if status=="BUY menu" and COOKIE.count >= WIZARDTWR.price or (status=="SELL menu" and WIZARDTWR.count>0) then
 		Graphics.drawPartialImage(STORE.x, STORE.y+231, 150, 231, 150, 33, ButtonsSheet)
-	elseif COOKIE.total >= 330000000 and COOKIE.count<WIZARDTWR.price then
+	elseif COOKIE.total >= 330000000 and COOKIE.count<WIZARDTWR.price or (status=="SELL menu" and WIZARDTWR.count==0 and COOKIE.total > 330000000) then
 		Graphics.drawPartialImage(STORE.x, STORE.y+231, 150, 231, 150, 33, ButtonsSheet,Shade)
 	elseif COOKIE.total < 330000000 then
 		Graphics.drawPartialImage(STORE.x, STORE.y+231, 0, 231, 150, 33, ButtonsSheet,Shade)
@@ -591,8 +657,7 @@ while true do
 	if status=="SELL menu" then
 		Graphics.drawImage(250, 86, frameus)
 	end
-	screenshotmake()
-	Graphics.termBlend()
+	
 	if Controls.check(pad,KEY_SELECT) and not Controls.check(oldpad,KEY_SELECT) and status=="BUY menu" then
 		status="SELL menu"
 	
@@ -601,12 +666,12 @@ while true do
 	
 	end
 	if status=="BUY menu" then
-		Screen.debugPrint(255, 47,"    BUY menu", green, TOP_SCREEN)
+		gpu_drawtext(255, 47,"    BUY menu", green)
 	elseif status=="SELL menu" then
-		Screen.debugPrint(255, 47,"    SELL menu", blue, TOP_SCREEN)
+		gpu_drawtext(255, 47,"    SELL menu", blue)
 	end
 	if STORE.stat==0 then 
-	Screen.debugPrint(205, 47,CURSOR.count, white, TOP_SCREEN) 
+	gpu_drawtext(379, 55,CURSOR.count, white) 
 	if status=="BUY menu" then
 	Price = CURSOR.price
 	elseif status=="SELL menu" then
@@ -614,7 +679,7 @@ while true do
 	end
 	end
 	if STORE.stat==1 then 
-	Screen.debugPrint(205, 47,GRANDMA.count, white, TOP_SCREEN)
+	gpu_drawtext(379, 55,GRANDMA.count, white)
 	if status=="BUY menu" then
 	Price = GRANDMA.price
 	elseif status=="SELL menu" then
@@ -622,7 +687,7 @@ while true do
 	end
 	end
 	if STORE.stat==2 then 
-	Screen.debugPrint(205, 47,FARM.count,white, TOP_SCREEN)
+	gpu_drawtext(379, 55,FARM.count, white)
 	if status=="BUY menu" then
 	Price = FARM.price
 	elseif status=="SELL menu" then
@@ -630,7 +695,7 @@ while true do
 	end
 	end
 	if STORE.stat==3 then 
-	Screen.debugPrint(205, 47,MINE.count, white, TOP_SCREEN)
+	gpu_drawtext(379, 55,MINE.count, white)
 	if status=="BUY menu" then
 	Price = MINE.price
 	elseif status=="SELL menu" then
@@ -638,7 +703,7 @@ while true do
 	end
 	end
 	if STORE.stat==4 then 
-	Screen.debugPrint(205, 47,FACTORY.count, white, TOP_SCREEN)
+	gpu_drawtext(379, 55,FACTORY.count, white)
 	if status=="BUY menu" then
 	Price = FACTORY.price
 	elseif status=="SELL menu" then
@@ -646,7 +711,7 @@ while true do
 	end
 	end
 	if STORE.stat==5 then 
-	Screen.debugPrint(205, 47,BANK.count, white, TOP_SCREEN)
+	gpu_drawtext(379, 55,BANK.count, white)
 	if status=="BUY menu" then
 	Price = BANK.price
 	elseif status=="SELL menu" then
@@ -654,7 +719,7 @@ while true do
 	end
 	end
 	if STORE.stat==6 then 
-	Screen.debugPrint(205, 47,TEMPLE.count, white, TOP_SCREEN)
+	gpu_drawtext(379, 55,TEMPLE.count, white)
 	if status=="BUY menu" then
 	Price = TEMPLE.price
 	elseif status=="SELL menu" then
@@ -662,34 +727,33 @@ while true do
 	end
 	end
 	if STORE.stat==7 then 
-	Screen.debugPrint(205, 47,WIZARDTWR.count,white, TOP_SCREEN)
+	gpu_drawtext(379, 55,WIZARDTWR.count,white)
 	if status=="BUY menu" then
 	Price = WIZARDTWR.price
 	elseif status=="SELL menu" then
 	Price = WIZARDTWR.sellprice
 	end
 	end
-	
-	
-	Screen.debugPrint(253, 61,"  press SELECT ", white, TOP_SCREEN)
+	gpu_drawtext(253, 61,"  press SELECT ", white)
 	if status=="BUY menu" then
 	if Price>COOKIE.count then
-	Screen.debugPrint(270, 224,math.floor(Price), red, TOP_SCREEN)
+	gpu_drawtext(273, 226,math.floor(Price), red)
 	else
-	Screen.debugPrint(270, 224,math.floor(Price), green, TOP_SCREEN)
+	gpu_drawtext(273, 226,math.floor(Price), green)
 	end
 	end
 	if status=="SELL menu" then
-	Screen.debugPrint(270, 224,math.floor(Price), blue, TOP_SCREEN)
+	gpu_drawtext(273, 226,math.floor(Price),blue)
 	end
-	Screen.debugPrint(25, 10, math.floor(COOKIE.count).." Cookies                                                                                                       ", Color.new(255,255,255), TOP_SCREEN)
-	Screen.debugPrint(5, 30,"per second : "..CpS, white, TOP_SCREEN)
+	gpu_drawtext(25, 10,(math.floor(COOKIE.count)).." Cookies", white)
+	gpu_drawtext(5, 30,"per second : "..CpS, white)
 	if string.len(Tm)==2 then
-	Screen.debugPrint(5, 210,Th..":"..Tm, blue, TOP_SCREEN)
+	gpu_drawtext(5, 210,Th..": "..Tm, blue)
 	else
-	Screen.debugPrint(5, 210,Th..":0"..Tm, blue, TOP_SCREEN)
+	gpu_drawtext(5, 210,Th..": 0"..Tm, blue)
 	end
-	
+	screenshotmake()
+	Graphics.termBlend()
 	Graphics.initBlend(BOTTOM_SCREEN)
 	Graphics.drawImage(0, 0, BackgroundBottom)
 	Graphics.drawImageExtended(160, 120, 0, 0, 256, 256 ,SHINE.rot, 1,1, Shine)
@@ -721,10 +785,10 @@ while true do
 	CpSTemple=7800*TEMPLE.count
 	CpSWizard=44000*WIZARDTWR.count
 	CpS=CpSCursor+CpSGrandma+CpSFarm+CpSMine+CpSFactory+CpSBank+CpSTemple+CpSWizard
-	if Timer.getTime(timer)/100>=1 then
+	if Timer.getTime(timer)/40>=1 then
 		Timer.reset(timer)
-		COOKIE.count=COOKIE.count+CpS/10
-		COOKIE.total=COOKIE.total+CpS/10
+		COOKIE.count=COOKIE.count+CpS/25
+		COOKIE.total=COOKIE.total+CpS/25
 	end
 	if Timer.getTime(GetBattery)/60000>=1 then
 		Timer.reset(GetBattery)
@@ -804,14 +868,14 @@ while true do
 	else
 		justcurrency = 0
 		COOKIE = {size=1,count=0,total=0}
-		GRANDMA = {price = 100,count=0,currency = -1}
-		CURSOR = {price = 15,count=0,rot=0,speed=0.008,currency = -1}
-		FARM = {price = 1000,count=0,currency = -1}
-		MINE = {price = 12000,count=0,random={},currency = -1}
-		FACTORY = {price = 130000,count=0,currency = -1}
-		BANK = {price = 1400000,count=0,currency = -1}
-		TEMPLE = {price = 20000000,count=0,currency = -1}
-		WIZARDTWR = {price = 330000000,count=0,currency = -1}
+		GRANDMA = {price = 100,count=0,currency = -1,name="???"}
+		CURSOR = {price = 15,count=0,rot=0,speed=0.008,currency = -1,name="???"}
+		FARM = {price = 1000,count=0,currency = -1,name="???"}
+		MINE = {price = 12000,count=0,random={},currency = -1,name="???"}
+		FACTORY = {price = 130000,count=0,currency = -1,name="???"}
+		BANK = {price = 1400000,count=0,currency = -1,name="???"}
+		TEMPLE = {price = 20000000,count=0,currency = -1,name="???"}
+		WIZARDTWR = {price = 330000000,count=0,currency = -1,name="???"}
 		continue()
 		state="GAME"
 	end	
