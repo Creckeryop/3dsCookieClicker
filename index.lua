@@ -4,12 +4,14 @@ red=Color.new(255,80,80)
 yellow=Color.new(255,255,80)
 redformenu=Color.new(255,0,0)
 green=Color.new(80,255,80)
+gray=Color.new(80,80,80)
 white=Color.new(255,255,255)
+black=Color.new(0,0,0)
 WhiteShade=Color.new(255,255,255,100)
 blue=Color.new(80,80,255)
 Th,Tm,Ts = System.getTime()
 math.randomseed(Th*3600+Tm*60+Ts)
-img_font = Graphics.loadImage(System.currentDirectory().."data/Font.png")
+
 glyph_l = {}
 glyph_r = {}
 glyph_w = {}
@@ -19,46 +21,48 @@ function g_init(char, l, r) --this saves to an array the left and right pixels, 
     glyph_w[char] = r-l+1
 end
 --glyph_w = {} --precalculate this so it's faster on the text drawing system
-g_init('0',0,5)
-g_init('1',6,9)
-g_init('2',10,15)
-g_init('3',16,21)
-g_init('4',22,27)
-g_init('5',28,33)
-g_init('6',34,39)
-g_init('7',40,45)
-g_init('8',46,51)
-g_init('9',52,57)
-g_init('A',58,63)
-g_init('B',64,69)
-g_init('C',70,75)
-g_init('D',76,81)
-g_init('E',82,87)
-g_init('F',88,93)
-g_init('G',94,99)
-g_init('H',100,105)
-g_init('I',106,109)
-g_init('J',110,115)
-g_init('K',116,121)
-g_init('L',122,127)
-g_init('M',128,133)
-g_init('N',134,139)
-g_init('O',140,145)
-g_init('P',146,151)
-g_init('Q',152,157)
-g_init('R',158,163)
-g_init('S',164,169)
-g_init('T',170,175)
-g_init('U',176,181)
-g_init('V',182,187)
-g_init('W',188,193)
-g_init('X',194,199)
-g_init('Y',200,205)
-g_init('Z',206,211)
-g_init('.',212,213)
-g_init(' ',213,213)
-g_init(':',215,216)
-g_init('-',217,219)
+g_init('0',414,430)
+g_init('1',431,439)
+g_init('2',440,454)
+g_init('3',455,468)
+g_init('4',469,483)
+g_init('5',484,497)
+g_init('6',498,512)
+g_init('7',512,525)
+g_init('8',526,540)
+g_init('9',541,554)
+g_init('A',1,19)
+g_init('B',20,35)
+g_init('C',36,52)
+g_init('D',53,70)
+g_init('E',71,84)
+g_init('F',85,98)
+g_init('G',99,116)
+g_init('H',117,133)
+g_init('I',134,139)
+g_init('J',140,148)
+g_init('K',149,164)
+g_init('L',165,177)
+g_init('M',178,196)
+g_init('N',197,213)
+g_init('O',214,232)
+g_init('P',233,248)
+g_init('Q',249,268)
+g_init('R',269,284)
+g_init('S',285,296)
+g_init('T',297,310)
+g_init('U',311,327)
+g_init('V',328,344)
+g_init('W',345,367)
+g_init('X',368,383)
+g_init('Y',384,399)
+g_init('Z',400,413)
+g_init('.',562,568)
+g_init(' ',580,581)
+g_init(':',555,561)
+g_init('-',569,580)
+g_init('#',582,599)
+
 function gpu_drawtext(x, y, text, font_color)
     local text_u = string.upper(text) --my font system is caps-only.
     local i_str=0 --the current position in the string
@@ -71,14 +75,15 @@ function gpu_drawtext(x, y, text, font_color)
         i_chr = string.sub(text_u, i_str, i_str)
         cw = glyph_w[i_chr]
         if cw ~= nil then --as long as the character exists
-            Graphics.drawPartialImage(x+str_width, y, glyph_l[i_chr], 0, cw, 10, img_font, font_color)
-            str_width = str_width + cw + 1
+            Graphics.drawPartialImage(x+str_width, y, glyph_l[i_chr], 0, cw, 22, img_font, font_color)
+            str_width = str_width + cw - 1
         end
     end
 end
 if System.currentDirectory() == "/" then
  System.currentDirectory("romfs:/")
 end
+img_font = Graphics.loadImage(System.currentDirectory().."data/Font2.png")
 titlecreckeryop= Graphics.loadImage(System.currentDirectory().."data/titlecreckeryop.png")
 menutitle= Graphics.loadImage(System.currentDirectory().."data/menutitle.png")
 menugradient= Graphics.loadImage(System.currentDirectory().."data/menugradient.png")
@@ -102,11 +107,13 @@ resetOFF = Graphics.loadImage(System.currentDirectory().."data/resetOFF.png")
 resetNET = Graphics.loadImage(System.currentDirectory().."data/resetNET.png")
 AUTHORTEXT = Graphics.loadImage(System.currentDirectory().."data/AUTHOR.png")
 frameus = Graphics.loadImage(System.currentDirectory().."data/frameus.png")
+cookieshower = Graphics.loadImage(System.currentDirectory().."data/cookieShower1.png")
+cookieshowery = 0
 backx=0
 backy=0
 rota=255
 rotanum = 0
-version="0.8"
+version="0.9"
 Sound.init()
 function loadmusic()
 bgm = Sound.openOgg(System.currentDirectory().."data/bgm.ogg", false)
@@ -524,7 +531,6 @@ while true do
 	if BACK.y>62 then
 	BACK.y=62
 	end
-	Graphics.drawImage(5,7,favicon)
 	if status=="BUY menu" then
 	if Controls.check(pad,KEY_A) and not Controls.check(oldpad,KEY_A) and STORE.stat==0 and COOKIE.count >= CURSOR.price then
 		Graphics.drawImage(STORE.x, STORE.y+33*STORE.stat, pressed)
@@ -653,7 +659,6 @@ while true do
 	BANK.price=1400000*1.15^BANK.count
 	TEMPLE.price=20000000*1.15^TEMPLE.count
 	WIZARDTWR.price=330000000*1.15^WIZARDTWR.count
-	Graphics.drawImage(254, 221, favicon)
 	if status=="SELL menu" then
 		Graphics.drawImage(250, 86, frameus)
 	end
@@ -666,12 +671,14 @@ while true do
 	
 	end
 	if status=="BUY menu" then
-		gpu_drawtext(255, 47,"    BUY menu", green)
+		gpu_drawtext(265, 187,"BUY", white)
+		gpu_drawtext(332, 187,"SELL", gray)
 	elseif status=="SELL menu" then
-		gpu_drawtext(255, 47,"    SELL menu", blue)
+		gpu_drawtext(332, 187,"SELL", white)
+		gpu_drawtext(265, 187,"BUY", gray)
 	end
 	if STORE.stat==0 then 
-	gpu_drawtext(379, 55,CURSOR.count, white) 
+	gpu_drawtext(125,210,"# "..CURSOR.count, white) 
 	if status=="BUY menu" then
 	Price = CURSOR.price
 	elseif status=="SELL menu" then
@@ -679,7 +686,7 @@ while true do
 	end
 	end
 	if STORE.stat==1 then 
-	gpu_drawtext(379, 55,GRANDMA.count, white)
+	gpu_drawtext(125,210,"# "..GRANDMA.count, white)
 	if status=="BUY menu" then
 	Price = GRANDMA.price
 	elseif status=="SELL menu" then
@@ -687,7 +694,7 @@ while true do
 	end
 	end
 	if STORE.stat==2 then 
-	gpu_drawtext(379, 55,FARM.count, white)
+	gpu_drawtext(125,210,"# "..FARM.count, white)
 	if status=="BUY menu" then
 	Price = FARM.price
 	elseif status=="SELL menu" then
@@ -695,7 +702,7 @@ while true do
 	end
 	end
 	if STORE.stat==3 then 
-	gpu_drawtext(379, 55,MINE.count, white)
+	gpu_drawtext(125,210,"# "..MINE.count, white)
 	if status=="BUY menu" then
 	Price = MINE.price
 	elseif status=="SELL menu" then
@@ -703,7 +710,7 @@ while true do
 	end
 	end
 	if STORE.stat==4 then 
-	gpu_drawtext(379, 55,FACTORY.count, white)
+	gpu_drawtext(125,210,"# "..FACTORY.count, white)
 	if status=="BUY menu" then
 	Price = FACTORY.price
 	elseif status=="SELL menu" then
@@ -711,7 +718,7 @@ while true do
 	end
 	end
 	if STORE.stat==5 then 
-	gpu_drawtext(379, 55,BANK.count, white)
+	gpu_drawtext(125,210,"# "..BANK.count, white)
 	if status=="BUY menu" then
 	Price = BANK.price
 	elseif status=="SELL menu" then
@@ -719,7 +726,7 @@ while true do
 	end
 	end
 	if STORE.stat==6 then 
-	gpu_drawtext(379, 55,TEMPLE.count, white)
+	gpu_drawtext(125,210,"# "..TEMPLE.count, white)
 	if status=="BUY menu" then
 	Price = TEMPLE.price
 	elseif status=="SELL menu" then
@@ -727,31 +734,32 @@ while true do
 	end
 	end
 	if STORE.stat==7 then 
-	gpu_drawtext(379, 55,WIZARDTWR.count,white)
+	gpu_drawtext(125,210,"# "..WIZARDTWR.count,white)
 	if status=="BUY menu" then
 	Price = WIZARDTWR.price
 	elseif status=="SELL menu" then
 	Price = WIZARDTWR.sellprice
 	end
 	end
-	gpu_drawtext(253, 61,"  press SELECT ", white)
+	--gpu_drawtext(253, 61,"  press SELECT ", white)
 	if status=="BUY menu" then
 	if Price>COOKIE.count then
-	gpu_drawtext(273, 226,math.floor(Price), red)
+	gpu_drawtext(254, 220,math.floor(Price), red)
 	else
-	gpu_drawtext(273, 226,math.floor(Price), green)
+	gpu_drawtext(254, 220,math.floor(Price), green)
 	end
 	end
 	if status=="SELL menu" then
-	gpu_drawtext(273, 226,math.floor(Price),blue)
+	gpu_drawtext(254, 220,math.floor(Price),blue)
 	end
-	gpu_drawtext(25, 10,(math.floor(COOKIE.count)).." Cookies", white)
+	gpu_drawtext(5, 5,(math.floor(COOKIE.count)).."   Cookies", white)
 	gpu_drawtext(5, 30,"per second : "..CpS, white)
 	if string.len(Tm)==2 then
-	gpu_drawtext(5, 210,Th..": "..Tm, blue)
+	gpu_drawtext(5, 204,Th..": "..Tm, blue)
 	else
-	gpu_drawtext(5, 210,Th..": 0"..Tm, blue)
+	gpu_drawtext(5, 204,Th..": 0"..Tm, blue)
 	end
+	gpu_drawtext(290, 5,"STORE",white)
 	screenshotmake()
 	Graphics.termBlend()
 	Graphics.initBlend(BOTTOM_SCREEN)
@@ -838,12 +846,17 @@ while true do
 	end 
 	elseif state=="MENU" then
 	Graphics.initBlend(TOP_SCREEN)
+	cookieshowery=cookieshowery+2
 	Graphics.drawImage(backx, backy, BackgroundTop1)
+	Graphics.drawImage(0, cookieshowery-512, cookieshower)
+	Graphics.drawImage(0, cookieshowery, cookieshower)
+	if cookieshowery>512 then cookieshowery=0 end 
 	Graphics.drawImage(0, 0, menugradient)
 	Graphics.drawImage(0, 0, menutitle)
+	gpu_drawtext(300,220,"pre: "..version,white,TOP_SCREEN)
 	screenshotmake()
 	Graphics.termBlend()
-	Screen.debugPrint(300,220,"pre: "..version,white,TOP_SCREEN)
+	
 	Graphics.initBlend(BOTTOM_SCREEN)
 	Graphics.drawImage(backx, backy, BackgroundTop1)
 	
@@ -881,12 +894,16 @@ while true do
 	end	
 	elseif state=="OPTIONS" then
 	Graphics.initBlend(TOP_SCREEN)
+	cookieshowery=cookieshowery+2
 	Graphics.drawImage(backx, backy, BackgroundTop1)
+	Graphics.drawImage(0, cookieshowery-512, cookieshower)
+	Graphics.drawImage(0, cookieshowery, cookieshower)
+	if cookieshowery>512 then cookieshowery=0 end
 	Graphics.drawImage(0, 0, menugradient)
 	Graphics.drawImage(0, 0, menutitle)
+	gpu_drawtext(300,220,"pre: "..version,white,TOP_SCREEN)
 	screenshotmake()
 	Graphics.termBlend()
-	Screen.debugPrint(300,220,"pre: "..version,white,TOP_SCREEN)
 	Graphics.initBlend(BOTTOM_SCREEN)
 	Graphics.drawImage(backx, backy, BackgroundTop1)
 	if System.doesFileExist("/ccsave.sav") then
