@@ -15,8 +15,8 @@ This is a clone of Cookie Clicker game for Nintendo 3DS made on LUA:cookie:<br>
 * <kbd>A</kbd> - Select option / Buy 
 * <kbd>Y</kbd> - Upgrade
 * <kbd>SELECT</kbd> - BUY/SELL menu swap
-* <kbd>UP(Dpad) , DOWN(Dpad)</kbd> - Scrolling buy menu
-* <kbd>UP(Stick) , DOWN(Stick)</kbd> - Scrolling facilities
+* <kbd>UP(Dpad), DOWN(Dpad)</kbd> - Scrolling buy menu
+* <kbd>UP(Stick), DOWN(Stick)</kbd> - Scrolling facilities
 * <kbd>R+L</kbd> - Screenshot
 ## Credits
 * [Rinnegatamante](https://github.com/Rinnegatamante/) - [lpp-3ds](https://github.com/Rinnegatamante/lpp-3ds)
