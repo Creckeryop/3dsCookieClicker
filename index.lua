@@ -432,7 +432,7 @@ function System.wait(milliseconds)
 	Timer.destroy(tmp)
 end
 loadmussic=1
-while true do
+while System.mainLoop() do
 	Screen.refresh()
 	Screen.clear(TOP_SCREEN)
 	Screen.clear(BOTTOM_SCREEN)
